@@ -6,7 +6,7 @@ If there is no profile, ask the human these four questions. Save their answers i
 
 1. Which models and effort should the orchestrator and the workers use?
 2. What may workers do without asking? Push to their own branch? Open draft PRs? Reply to bot review comments? Update tickets?
-3. What must always be asked first? Replies to humans, merges, labels that stand for a human sign-off, anything public?
+3. What must always be asked first? The default is every written update to trackers and code review (comments, ticket edits, PR bodies, replies), plus merges, sign-off labels and anything public.
 4. What does "ready" mean in this repo? Which checks, which review steps, which PR body rules?
 
 ```markdown

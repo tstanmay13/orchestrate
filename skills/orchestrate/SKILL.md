@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "<goal, ticket, or 'resume <run>'>"
 license: MIT
 metadata:
-  version: 0.1.0
+  version: 0.1.1
 ---
 
 # orchestrate
@@ -79,10 +79,11 @@ Loop the human in only for these:
 
 - a decision from step 1 that has newly come up
 - an irreversible or outward-facing action the profile does not already permit
+- any text that others will read, such as a tracker comment, a ticket edit, a PR body, or a review reply. The default is to draft it, show it, and post only what the human approves. Only a profile can grant more. The work keeps going while drafts wait.
 - a unit that has failed twice
 - instructions that contradict each other
 
-Send them as one batch of pickers with your recommendation and the evidence. Use a push notification if one is available. Everything else waits until the closing report.
+Send them as one batch of pickers with your recommendation and the evidence. Use a push notification if one is available. This applies to you as well as to workers. Everything else waits until the closing report.
 
 ### 9. Close
 
