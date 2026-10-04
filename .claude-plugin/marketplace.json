@@ -1,0 +1,11 @@
+{
+  "name": "tstanmay13-orchestrate",
+  "owner": { "name": "Tanmay Singh" },
+  "plugins": [
+    {
+      "name": "orchestrate",
+      "source": { "source": "github", "repo": "tstanmay13/orchestrate" },
+      "description": "Run a multi-session job as its orchestrator: plan, brief worker sessions, monitor, verify their claims, and loop the human in only for decisions."
+    }
+  ]
+}
