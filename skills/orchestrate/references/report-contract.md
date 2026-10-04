@@ -20,7 +20,7 @@ Branch: <branch>   Tip: <full SHA, pushed? yes/no>   PR: <url or none>
 <Each as a question with options and your recommendation. Leave empty if there are none.>
 
 ## Drafts for the human
-<Any text meant for a tracker, a PR or a review thread, ready to paste, each labelled with where it goes. Do not post these yourself unless the profile allows it.>
+<Any text meant for a tracker, a PR or a review thread, ready to paste, each labelled with where it goes. Write them in the voice the profile names. Do not post these yourself unless the profile allows it.>
 
 ## Found elsewhere
 <Defects whose cause is outside this unit: where they are, the evidence, and a suggested owner. Do not fix these.>

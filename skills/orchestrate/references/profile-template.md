@@ -37,6 +37,9 @@ Orchestrator: <model, effort>   Workers: <model, effort>
 ## Branching and stacks
 <Merge forward vs rebase, force-push policy, who owns stack operations>
 
+## Voice
+<Skill or style guide for text the human will post under their own name, if any>
+
 ## Reporting to the human
 <Style, naming conventions, what counts as worth an interruption>
 
