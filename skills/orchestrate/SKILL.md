@@ -73,7 +73,18 @@ A report is a **claim**. For each one:
 
 A defect belongs to the unit that **caused** it. Brief that unit's owner. The unit that found the defect adds only a regression test. When a worker reports a problem outside the job, record it as a non-blocking ticket draft and keep going. If a unit fails the same way twice, stop that unit and escalate.
 
-### 8. Escalate
+### 8. Hand over for merge, with understanding
+
+A PR goes to the human for merge only after they understand it. A green CI is not enough. For each PR, write a **merge brief** from [references/merge-brief.md](references/merge-brief.md):
+- what was wrong or missing before, and what is observably different after
+- how it works, walked through one concrete example
+- what was tested, how, and why that test is the right one, plus what is still unverified
+- the decisions made along the way and the alternatives rejected
+- the riskiest lines to read in review, with file:line
+
+Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then mark the PR ready or ask them to merge.
+
+### 9. Escalate
 
 Loop the human in only for these:
 
@@ -85,7 +96,7 @@ Loop the human in only for these:
 
 Send them as one batch of pickers with your recommendation and the evidence. Use a push notification if one is available. This applies to you as well as to workers. Everything else waits until the closing report.
 
-### 9. Close
+### 10. Close
 
 When every outcome is met, or blocked only on the human, write the closing report: what changed (with links), what was verified and how, what is still open, and what the human needs to do. Append corrections from this run to `lessons.md`, and propose the durable ones as edits to the profile. Stop your wakeups and monitors. Tell owners they are done so they can be stopped.
 
@@ -95,4 +106,5 @@ When every outcome is met, or blocked only on the human, write the closing repor
 - [references/report-contract.md](references/report-contract.md): what every worker report must contain
 - [references/workers.md](references/workers.md): starting, messaging, pausing and stopping worker sessions
 - [references/lessons.md](references/lessons.md): failure modes seen in real runs. Read it once per run, before dispatch.
+- [references/merge-brief.md](references/merge-brief.md): what to explain before a human merges
 - [references/profile-template.md](references/profile-template.md): the project profile format
