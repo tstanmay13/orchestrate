@@ -66,6 +66,7 @@ A report is a **claim**. For each one:
 - Check the evidence yourself. Read the CI result at the reported SHA, run the acceptance command in your scratch space or through a subagent, and read the diff.
 - Check that the report matches [references/report-contract.md](references/report-contract.md). Send back any report with missing fields.
 - Check every finding from an AI reviewer against the code before passing it on.
+- Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
 **Done when** each acceptance criterion has evidence that you saw first-hand.
 

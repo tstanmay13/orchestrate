@@ -34,3 +34,7 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 
 - **A background worker failed at startup and left no transcript.** It never showed up in the peer list, and the orchestrator didn't notice for half an hour. Practice: about a minute after dispatch, confirm every new worker is `working` (`claude agents --json --all`) and appears in `ListAgents`. Subscribe to its idle notice only after it appears.
 - **A subagent's research was posted as fact and was wrong.** Practice: research from a subagent is a claim too. Check it against the source before it goes into a brief or anything others read.
+
+## Review findings
+
+- **A reviewer flagged, in every round, that a test suite ran only against a hand-written fake of another service, and the worker declined it as out of scope.** The orchestrator read the report and passed on the summary without surfacing that finding. The human found the same problem a day later. Practice: approach-level findings a worker declines go straight to the human.
