@@ -53,7 +53,7 @@ Hand each brief to an owner. See [references/workers.md](references/workers.md) 
 - **Existing session:** if the human names a session, or `ListAgents` shows an idle one that already owns the branch, send it a short message. The message gives the brief path, the profile path, the report contract, and who to report to (your session name).
 - **New session:** start one background session per unit from that unit's worktree with `claude --bg -n <run>-<unit>`, passing the same short prompt. The launch prompt carries the human's authority. Later messages do not, so everything the worker needs approved goes in the launch prompt.
 
-Record each owner's session ref in `state.md`, not its display name, because names drift. **Done when** every unit in the current wave has an owner that has acknowledged the brief.
+Record each owner's session ref in `state.md`, not its display name, because names drift. About a minute after starting a new session, confirm it is running and visible to `ListAgents`, then subscribe to its idle notice. **Done when** every unit in the current wave has an owner that has acknowledged the brief.
 
 ### 5. Monitor
 

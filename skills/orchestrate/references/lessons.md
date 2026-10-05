@@ -29,3 +29,8 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 - **A push from the wrong worktree** with `HEAD:<branch>` overwrote a branch and closed its PR. Practice: push only from the branch's own worktree, by name, after `git status` shows that branch.
 - **A check and an irreversible command were chained with `;`.** The check failed, and the command ran anyway. Practice: use `&&` or separate calls, and read the check's output first.
 - **Only one session may restructure a PR stack.** For example, `gh stack link` only appends and never reorders. Practice: stack operations belong to the orchestrator, or to whoever the profile names.
+
+## Startup
+
+- **A background worker failed at startup and left no transcript.** It never showed up in the peer list, and the orchestrator didn't notice for half an hour. Practice: about a minute after dispatch, confirm every new worker is `working` (`claude agents --json --all`) and appears in `ListAgents`. Subscribe to its idle notice only after it appears.
+- **A subagent's research was posted as fact and was wrong.** Practice: research from a subagent is a claim too. Check it against the source before it goes into a brief or anything others read.
