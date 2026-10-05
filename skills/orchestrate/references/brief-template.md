@@ -31,6 +31,7 @@ You own this branch. No other session works on it.
 
 ## Acceptance
 <Checks that a command or a URL can settle: test commands with expected results, CI green at the tip, PR body validator passes.>
+<If the profile names a final review, it runs over the final diff after the last code change, before the PR is created or moved forward.>
 
 ## Report
 Write reports/<NN>-<unit>.md in the run directory following references/report-contract.md, then SendMessage the orchestrator with the path and a two-line summary. Report when done, when blocked, or when you need a decision. Do not report progress for its own sake.
