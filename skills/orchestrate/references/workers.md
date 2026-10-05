@@ -31,7 +31,7 @@ Create the worktree first if it doesn't exist: `git worktree add -b <branch> <pa
 ## Pausing, stopping, steering
 
 - Stop a session: `claude stop <id>`. Confirm with `claude agents` that it shows as stopped.
-- Resume a stopped session: send it a message, or have the human run `claude attach <id>`.
+- Resume a stopped or `blocked` session (a background worker can drop out of `ListAgents` after it finishes a turn, and SendMessage then fails with "not reachable"): find its `sessionId` in `claude agents --json --all`, then run from its worktree `claude --bg --resume <sessionId> -n <name> "<instruction>"`. The new prompt carries the human's authority, so put the approval you are passing on into it. The human can also run `claude attach <id>`.
 - To change effort or model mid-run, ask the human to attach and change it there, or stop the session and start a fresh one with a new brief.
 - To save context, a worker can compact itself between units. Ask it to do so only after its report file is written.
 
