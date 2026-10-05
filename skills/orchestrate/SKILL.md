@@ -79,7 +79,7 @@ Loop the human in only for these:
 
 - a decision from step 1 that has newly come up
 - an irreversible or outward-facing action the profile does not already permit
-- any text that others will read, such as a tracker comment, a ticket edit, a PR body, or a review reply. The default is to draft it, show it, and post only what the human approves. Only a profile can grant more. The work keeps going while drafts wait.
+- comments others will read: review replies, PR comments, and tracker comments or ticket edits. The default is to draft them, show them, and post only what the human approves. Only a profile can change this. The work keeps going while drafts wait. Opening PRs and writing their bodies is part of the work: workers do it themselves, after the final review the profile names.
 - a unit that has failed twice
 - instructions that contradict each other
 
