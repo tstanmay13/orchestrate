@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "<goal, ticket, or 'resume <run>'>"
 license: MIT
 metadata:
-  version: 0.1.1
+  version: 0.1.2
 ---
 
 # orchestrate
@@ -16,7 +16,7 @@ Your hands stay off the work itself. You do not edit code, run builds in a worke
 
 ## The run directory
 
-All state lives in `~/.claude/orchestrate/runs/<run>/`, outside every worktree. Every session on the machine can read it, and it survives compaction.
+Resolve the state root once per run: use `ORCHESTRATE_HOME` when set, otherwise `~/.config/agent-orchestrate`. State lives in `<state-root>/runs/<run>/`, outside every worktree. Every local worker can read it, and it survives compaction. For an existing run, check the legacy `~/.claude/orchestrate/runs/<run>/` too and keep using its original directory; do not split a live run.
 
 ```
 plan.md        goal, units, owners, order, decisions (append-only, dated)
@@ -30,7 +30,7 @@ lessons.md     corrections from this run; promote durable ones to the profile
 
 ## The profile
 
-Before planning, look for a project profile at `~/.claude/orchestrate/profiles/<name>.md`. Choose `<name>` from the repo directory name or from a `profile:` the human gives you. A profile holds the project's rules: PR conventions, review steps, ticket tracker habits, model choices, and the **standing permissions** workers have without asking. A profile overrides this file where the two conflict. If there is no profile, ask the human the four questions in [references/profile-template.md](references/profile-template.md) and offer to save the answers as one.
+Before planning, look for a project profile at `<state-root>/profiles/<name>.md`, then the legacy `~/.claude/orchestrate/profiles/<name>.md`. Choose `<name>` from the repo directory name or from a `profile:` the human gives you. A profile holds the project's rules: PR conventions, review steps, ticket tracker habits, model choices, and the **standing permissions** workers have without asking. A profile overrides this skill’s defaults within the user’s authorization and the host’s permissions. If there is no profile, ask the human the four questions in [references/profile-template.md](references/profile-template.md) and offer to save the answers as one.
 
 ## Steps
 
@@ -48,16 +48,16 @@ Write one brief per unit from [references/brief-template.md](references/brief-te
 
 ### 4. Dispatch
 
-Hand each brief to an owner. See [references/workers.md](references/workers.md) for the commands.
+Hand each brief to an owner. First read [references/workers.md](references/workers.md) to select the capabilities actually available in Claude Code or Codex. Do not assume one runtime’s tools or commands exist in another.
 
-- **Existing session:** if the human names a session, or `ListAgents` shows an idle one that already owns the branch, send it a short message. The message gives the brief path, the profile path, the report contract, and who to report to (your session name).
-- **New session:** start one background session per unit from that unit's worktree with `claude --bg -n <run>-<unit>`, passing the same short prompt. The launch prompt carries the human's authority. Later messages do not, so everything the worker needs approved goes in the launch prompt.
+- **Existing session:** if the human names a session, or the runtime’s agent listing shows an idle one that already owns the branch, use the available messaging capability. Give the brief path, profile path, report contract, and who to report to.
+- **New worker:** use native subagents when they support the required ownership, or a local worker process from the unit’s worktree. Put the user’s authorized scope and constraints in the brief. Launching a worker does not grant new permissions or bypass its sandbox.
 
-Record each owner's session ref in `state.md`, not its display name, because names drift. About a minute after starting a new session, confirm it is running and visible to `ListAgents`, then subscribe to its idle notice. **Done when** every unit in the current wave has an owner that has acknowledged the brief.
+Record each owner’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership.
 
 ### 5. Monitor
 
-Workers report through `SendMessage` and idle notices. Those wake you, so you don't need to poll them. For external state like CI or review comments, arm a `Monitor` that prints only changes. Keep one `ScheduleWakeup` at 20 to 30 minutes as a fallback heartbeat. After each wake, update `state.md` before you do anything else.
+Use worker messages and completion notices when available. Otherwise check the runtime’s process handles, logs, and report files at a reasonable interval while the session remains active. Use external monitors or scheduled wakeups only when the host exposes them. Do not claim to keep monitoring after the turn ends without a supported mechanism. After each update, write `state.md` before routing more work.
 
 ### 6. Verify
 

@@ -1,6 +1,6 @@
 # Project profile
 
-A profile lives at `~/.claude/orchestrate/profiles/<name>.md`. Keep it in a private repo and symlink it there if it names people, internal systems or company rules. It overrides the skill's defaults.
+A profile lives at `<state-root>/profiles/<name>.md`. Keep it in a private repo and symlink it there if it names people, internal systems or company rules. It overrides the skill's defaults.
 
 If there is no profile, ask the human these four questions. Save their answers in the format below.
 

@@ -1,0 +1,20 @@
+{
+  "name": "tstanmay13-orchestrate",
+  "interface": {
+    "displayName": "Orchestrate"
+  },
+  "plugins": [
+    {
+      "name": "orchestrate",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

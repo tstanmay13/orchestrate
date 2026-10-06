@@ -1,0 +1,6 @@
+interface:
+  display_name: "Orchestrate"
+  short_description: "Coordinate workers and verify their reports"
+  default_prompt: "Use $orchestrate to plan and coordinate this job across workers."
+policy:
+  allow_implicit_invocation: false

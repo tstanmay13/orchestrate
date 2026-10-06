@@ -5,7 +5,7 @@ A brief is the whole contract with a worker. Write it so the worker never has to
 ```markdown
 # <NN> <unit name>
 
-Run: <run>   Orchestrator: <your session name/ref>   Profile: ~/.claude/orchestrate/profiles/<name>.md
+Run: <run>   Orchestrator: <your session name/ref>   Profile: <state-root>/profiles/<name>.md
 
 ## Goal
 <One or two sentences: the observable outcome, for someone who has not followed along.>

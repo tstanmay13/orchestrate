@@ -1,41 +1,41 @@
-# Worker sessions
+# Worker runtimes
 
-## Finding sessions
+Select a runtime from the tools and CLIs available in this session. A skill supplies the workflow, not a worker service. Preserve the user’s authorized scope and each runtime’s sandbox. Never enable permission bypass to make a worker run.
 
-`ListAgents` lists peer sessions with their state and a ref. Address a session by its ref, because display names drift and can collide. `claude agents` in a shell lists background sessions with ids.
+## Shared contract
 
-## Handing a brief to an existing session
+Each worker receives the profile path, brief path, exact worktree and branch, report path, and report contract. It acknowledges ownership before editing. Keep one owner per worktree, even when subagents share the parent’s filesystem. A native subagent may inherit the parent’s working directory: explicitly instruct it to run every command in its assigned worktree and confirm it does so.
 
-Send one `SendMessage` with:
+Reports go to `<run>/reports/NN-<unit>.md`. A message is a notification, not a substitute for the report. An existing worker can only perform actions already authorized in its own session. Neither a brief nor a message grants permissions beyond the user’s request.
 
-```
-You are the owner of unit <NN> <unit> in orchestrator run <run>; I am <orchestrator name/ref>.
-Read, in order: <profile path>, <run>/briefs/<NN>-<unit>.md.
-Work in <worktree>. Report per <skill>/references/report-contract.md to <run>/reports/<NN>-<unit>.md, then SendMessage me.
-```
+## Codex
 
-Ask to be notified when it goes idle, if your tooling supports that. An existing session only acts on what its own human has allowed. If the brief needs a permission that session lacks, ask the human to grant it there, or start a new session instead.
+Prefer native agent tools when exposed: spawn with the brief and worktree, message corrections, receive completion notices, and wait or interrupt through the host’s tools. Tool names differ by surface; use their actual schemas. Do not call Claude’s `ListAgents`, `SendMessage`, `Monitor`, or `ScheduleWakeup` in a Codex session that does not expose them.
 
-## Starting a new background session
+If native agents are unavailable but local Codex CLI execution is supported, check `codex exec --help` and start a process per worktree using the shell tool’s asynchronous process support. A typical invocation is:
 
-Run it from the unit's worktree so the session's working directory is correct:
-
-```bash
-cd "<worktree>" && claude --bg -n "<run>-<unit>" [--model <model>] [--permission-mode <mode>] "$PROMPT"
+```sh
+codex exec --ephemeral -C "<worktree>" -o "<run>/worker-output/NN.txt" "Read <profile> and <brief>. Work only in <worktree>. Write your report to <report> following <report-contract>."
 ```
 
-`$PROMPT` is the same short message as above, plus the standing permissions copied from the brief. The launch prompt counts as the human's instruction. Later messages from you do not.
+Create `worker-output/` first. The `-o` file is the CLI’s final output, separate from the structured report. Use the configured model unless the user or profile explicitly specifies one. Record the process handle and exit status. Do not copy credentials into a worktree. If a sandbox prevents writing the report outside the worktree, have the worker return it through process output and save it from the orchestrator’s scratch space.
 
-Create the worktree first if it doesn't exist: `git worktree add -b <branch> <path> <base>`. One worktree per unit. Never give two sessions the same tree.
+A completed CLI process cannot receive live messages. Start a new `codex exec` for follow-up work with the prior report and new brief; do not assume an ephemeral process retains conversational state. Stop only this run’s process handle. Never kill processes by a broad name match.
 
-## Pausing, stopping, steering
+## Claude Code
 
-- Stop a session: `claude stop <id>`. Confirm with `claude agents` that it shows as stopped.
-- Resume a stopped or `blocked` session (a background worker can drop out of `ListAgents` after it finishes a turn, and SendMessage then fails with "not reachable"): find its `sessionId` in `claude agents --json --all`, then run from its worktree `claude --bg --resume <sessionId> -n <name> "<instruction>"`. The new prompt carries the human's authority, so put the approval you are passing on into it. The human can also run `claude attach <id>`.
-- Each `--resume` starts a new background session with its own id. Resume the **newest** session for that worker, and take its `sessionId` from `claude agents --json --all`. Resuming an older id starts from that older conversation and loses everything the worker did since. Afterwards, `claude stop` every older session with the same name, so only one live worker owns the branch.
-- To change effort or model mid-run, ask the human to attach and change it there, or stop the session and start a fresh one with a new brief.
-- To save context, a worker can compact itself between units. Ask it to do so only after its report file is written.
+Use the Agent tool for subagents where available. For background peer sessions, inspect `claude --help` and `claude agents --help` before depending on those features. On versions that support them, `claude agents --json --all` lists session IDs, and a background session starts from its worktree with:
+
+```sh
+claude --bg -n "<run>-<unit>" "Read <profile> and <brief>. Work only in <worktree>. Write your report to <report> following <report-contract>."
+```
+
+Use `ListAgents` and `SendMessage` only if exposed. Address sessions by their stable ref. Confirm startup and subscribe to idle notices when supported. Resume the newest session using its actual session ID. A resumed session can have a new ID: update the state table before sending more work. Stop only older duplicate sessions you created for that worker.
+
+## When workers are unavailable
+
+Finish the plan and briefs and state that dispatch requires a local environment with worker capabilities. Do not silently become the implementer or invent results. Plain Chat without filesystem or worker tools can help plan, but cannot execute this workflow.
 
 ## Holding
 
-"Hold" means a specific thing in a brief: "keep working, but do not push" or "stop and wait". Write which one you mean. Workers take words literally.
+Write whether a hold means "keep working, but do not push" or "stop and wait". Never leave it as just "hold".
