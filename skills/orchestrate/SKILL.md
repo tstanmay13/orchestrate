@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "<goal, ticket, or 'resume <run>'>"
 license: MIT
 metadata:
-  version: 0.1.2
+  version: 0.1.3
 ---
 
 # orchestrate
@@ -36,7 +36,17 @@ Before planning, look for a project profile at `<state-root>/profiles/<name>.md`
 
 ### 1. Intake
 
-Restate the goal as observable outcomes, such as "PR X merged with Y" or "ticket Z closed with evidence". Read the sources the human points at: the ticket, the PR, the earlier transcript. Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
+Restate the goal as observable outcomes, such as "PR X merged with Y" or "ticket Z closed with evidence". Read the sources the human points at: the ticket, the PR, the earlier transcript.
+
+Then take the deeper version of the job, not a bigger one. Answer four questions in `plan.md` before you plan:
+1. What would a top practitioner in this field do here that the request doesn't ask for? Name the risks they would test against, not only the features they would build.
+2. What is the rawest material they would start from, instead of what has already been digested? Source code, specs and standards, real data and logs come first. Tickets, summaries and earlier reports are pointers, never evidence.
+3. Which specific methods and tools would they use to do the work and to check it?
+4. What, other than you or the workers, would show the result is right? A real user run, an outside client still working, production signals against a baseline, CI, an independent reviewer. These become acceptance criteria.
+
+Fold the answers into the units and briefs. Keep the scope the human asked for: depth changes how each unit is done and proven, not how many units there are.
+
+Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
 
 ### 2. Plan
 

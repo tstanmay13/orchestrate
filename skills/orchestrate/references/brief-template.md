@@ -29,8 +29,12 @@ You own this branch. No other session works on it.
 ## You may, without asking
 <The standing permissions for this unit, e.g. "commit and push to this branch", "open a draft PR", "reply to and resolve bot review threads". Anything not listed here, ask first.>
 
+## Sources and threats
+<The raw material to start from (source files, specs, real data), with paths. The risks a practitioner would test, each as a test that must go red without the change.>
+
 ## Acceptance
 <Checks that a command or a URL can settle: test commands with expected results, CI green at the tip, PR body validator passes.>
+<At least one check from outside the worker: a real run, an outside client, a production signal against a baseline, or an independent review.>
 <If the profile names a final review, it runs over the final diff after the last code change, before the PR is created or moved forward.>
 
 ## Report
