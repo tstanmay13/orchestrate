@@ -90,9 +90,11 @@ Then audit the evidence yourself:
 - Check the implementer's report against [references/report-contract.md](references/report-contract.md) and send back any report with missing fields.
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
-**Done when** each acceptance criterion has evidence you checked, the verified tip in `state.md` equals the PR head, CI is green there, and no review thread is unanswered. This is the **ready gate**. A green CI result or an implementer's own review cannot replace it. Any later push reopens it.
+There are two gates:
+- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. When it passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. CI and any automated PR review loop the profile names may still be running.
+- **Merge gate**: each acceptance criterion has evidence you checked, the verified tip in `state.md` equals the PR head, CI is green there, the automated review loop has finished, and no review thread is unanswered. Then go to step 8.
 
-When the ready gate passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. Merging is separate and waits for step 8.
+A green CI result or an implementer's own review cannot replace the verifier. A push that changes behaviour reopens both gates for what it changed.
 
 ### 7. Route
 
@@ -107,7 +109,7 @@ A PR goes to the human for merge only after they understand it. A green CI is no
 - the decisions made along the way and the alternatives rejected
 - the riskiest lines to read in review, with file:line
 
-Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge. Readiness for review is the ready gate in step 6, not this step.
+Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge, and only once the merge gate in step 6 has passed. Readiness for review is the ready gate in step 6, not this step.
 
 After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 
