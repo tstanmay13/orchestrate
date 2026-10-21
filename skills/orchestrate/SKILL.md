@@ -91,7 +91,7 @@ Then audit the evidence yourself:
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
 There are two gates:
-- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. When it passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. CI and any automated PR review loop the profile names may still be running.
+- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. When it passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. Start any automated PR review loop the profile names right away, in parallel with CI. Neither waits for the other.
 - **Merge gate**: each acceptance criterion has evidence you checked, the verified tip in `state.md` equals the PR head, CI is green there, the automated review loop has finished, and no review thread is unanswered. Then go to step 8.
 
 A green CI result or an implementer's own review cannot replace the verifier. A push that changes behaviour reopens both gates for what it changed.
