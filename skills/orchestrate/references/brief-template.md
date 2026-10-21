@@ -27,7 +27,7 @@ You own this branch. No other session works on it.
 <What belongs to another unit or a later ticket. If you hit it, report it. Don't do it.>
 
 ## You may, without asking
-<The standing permissions for this unit, e.g. "commit and push to this branch", "open a draft PR", "reply to and resolve bot review threads". Anything not listed here, ask first.>
+<The standing permissions for this unit, e.g. "commit and push to this branch", "open the PR, and mark it ready once the orchestrator says the ready gate passed", "reply to and resolve bot review threads". Anything not listed here, ask first.>
 
 ## Sources and threats
 <The raw material to start from (source files, specs, real data), with paths. The risks a practitioner would test, each as a test that must go red without the change.>

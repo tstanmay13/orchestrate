@@ -35,6 +35,7 @@ The orchestrator names the depth in the request. The verifier may raise it and m
   - Did the relevant checks actually run and pass at this SHA?
   - Which concrete counterexample, regression, missing case or unsupported claim remains?
   - For each class in the run context, does this unit have it?
+  - Open review threads: list the PR's unresolved threads at this tip yourself and compare with the implementer's list. A thread with no answer, or one marked fixed that the code doesn't fix, is a finding.
 - **Proof.** Every finding comes with a failing test, a scratch run, a trace with file:line, or a CI log line. Anything argued only by reasoning is marked unproven.
 - **Classes, not instances.** When one instance of a defect turns up, look for its siblings and its root.
 

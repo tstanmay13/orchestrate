@@ -85,11 +85,14 @@ Keep `verifier-context.md` current: when a lesson lands in `lessons.md` or a dec
 Then audit the evidence yourself:
 
 - The verified tip equals the PR head equals the SHA CI ran on. Relevant jobs actually ran.
+- No review thread is left without an answer. List the unresolved threads yourself and check each has one: fixed at a SHA, a reply drafted for the human, or a decision raised.
 - Spot-check the verifier's findings against the code before routing them. Don't dismiss a disputed finding from either session without evidence.
 - Check the implementer's report against [references/report-contract.md](references/report-contract.md) and send back any report with missing fields.
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
-**Done when** each acceptance criterion has evidence you checked, and the verified tip in `state.md` equals the PR head. A green CI result or an implementer's own review cannot replace this gate. Any later push reopens it.
+**Done when** each acceptance criterion has evidence you checked, the verified tip in `state.md` equals the PR head, CI is green there, and no review thread is unanswered. This is the **ready gate**. A green CI result or an implementer's own review cannot replace it. Any later push reopens it.
+
+When the ready gate passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. Merging is separate and waits for step 8.
 
 ### 7. Route
 
@@ -104,7 +107,7 @@ A PR goes to the human for merge only after they understand it. A green CI is no
 - the decisions made along the way and the alternatives rejected
 - the riskiest lines to read in review, with file:line
 
-Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then mark the PR ready or ask them to merge.
+Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge. Readiness for review is the ready gate in step 6, not this step.
 
 After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 
