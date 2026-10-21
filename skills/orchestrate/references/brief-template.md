@@ -33,9 +33,12 @@ You own this branch. No other session works on it.
 <The raw material to start from (source files, specs, real data), with paths. The risks a practitioner would test, each as a test that must go red without the change.>
 
 ## Acceptance
-<Checks that a command or a URL can settle: test commands with expected results, CI green at the tip, PR body validator passes.>
-<At least one check from outside the worker: a real run, an outside client, a production signal against a baseline, or an independent review.>
+<Checks the implementer owns that a command or a URL can settle: test commands with expected results, CI green at the tip, PR body validator passes.>
 <If the profile names a final review, it runs over the final diff after the last code change, before the PR is created or moved forward.>
+
+## Independent gate
+Depth: <full | light, per references/verifier.md>
+<What the separate verifier must challenge from the original goal, raw sources and final diff. The orchestrator arranges this review after the implementer reports ready. Name any additional outside evidence needed, such as a real run, an outside client, or a production signal against a baseline.>
 
 ## Report
 Write reports/<NN>-<unit>.md in the run directory following references/report-contract.md, then SendMessage the orchestrator with the path and a two-line summary. Report when done, when blocked, or when you need a decision. Do not report progress for its own sake.

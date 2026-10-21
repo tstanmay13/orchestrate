@@ -4,7 +4,9 @@ Select a runtime from the tools and CLIs available in this session. A skill supp
 
 ## Shared contract
 
-Each worker receives the profile path, brief path, exact worktree and branch, report path, and report contract. It acknowledges ownership before editing. Keep one owner per worktree, even when subagents share the parent’s filesystem. A native subagent may inherit the parent’s working directory: explicitly instruct it to run every command in its assigned worktree and confirm it does so.
+Each implementer receives the profile path, brief path, exact worktree and branch, report path, and report contract. It acknowledges ownership before editing. Keep one implementing owner per worktree, even when subagents share the parent’s filesystem. A native subagent may inherit the parent’s working directory: explicitly instruct it to run every command in its assigned worktree and confirm it does so.
+
+The verifier is a separate session, on the model named by the profile, with read-only access to the implementation and its own scratch space for checks. Give it the original brief and raw sources first, following [verifier.md](verifier.md). Record its session ref and reviewed SHA separately from the implementer's. Do not quietly use an implementer, the orchestrator, or the implementer's review agent as the independent verifier.
 
 Reports go to `<run>/reports/NN-<unit>.md`. A message is a notification, not a substitute for the report. An existing worker can only perform actions already authorized in its own session. Neither a brief nor a message grants permissions beyond the user’s request.
 
@@ -31,6 +33,8 @@ claude --bg -n "<run>-<unit>" "Read <profile> and <brief>. Work only in <worktre
 ```
 
 Use `ListAgents` and `SendMessage` only if exposed. Address sessions by their stable ref. Confirm startup and subscribe to idle notices when supported. Resume the newest session using its actual session ID. A resumed session can have a new ID: update the state table before sending more work. Stop only older duplicate sessions you created for that worker.
+
+Existing interactive Claude sessions may live in terminal tabs and not appear in a background-agent listing. If a terminal manager exposes them, use its read-only listing to locate candidates, then confirm the session, worktree and branch before sending a brief through a native message tool. A tab title alone is not ownership evidence. A verifier may review several units sequentially, but each unit starts with a fresh independent first pass; if its context already includes an implementer's reasoning for that unit, use a fresh verifier session.
 
 ## When workers are unavailable
 

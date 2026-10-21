@@ -1,6 +1,6 @@
 # orchestrate
 
-A Claude Code and Codex skill for running a multi-session job as its orchestrator. One session plans the job, writes a brief for each unit of work, and hands each brief to a worker session. It then waits for reports, checks every claim itself, and sends each fix to the unit that caused the problem. The orchestrator never writes the code. You hear from it only when it needs a decision, and once more when the job is finished.
+A Claude Code and Codex skill for running a multi-session job as its orchestrator. One session plans the job and briefs an implementer for each unit. A separate verifier reviews the completed work from the original goal and raw evidence. The orchestrator checks the reports, sends findings back to the implementing owner, and hands over only work verified at its final SHA. The orchestrator never writes the code.
 
 ```
 /plugin marketplace add tstanmay13/claude-skills
@@ -18,7 +18,7 @@ Then:
 
 - **Run directory.** Each job gets `~/.config/agent-orchestrate/runs/<run>/` (or `ORCHESTRATE_HOME`), with `plan.md`, `state.md`, `briefs/`, `reports/` and `lessons.md`. It sits outside every worktree, so every session can read it, and it survives compaction.
 - **Briefs, not steps.** Each unit gets one brief: goal, exact worktree and branch, context with evidence, acceptance criteria a command can check, and the permissions the worker has without asking.
-- **Workers.** A worker is either a session you already have open or a new `claude --bg` session started in the unit's own worktree. Each worker reports in a fixed format, and the orchestrator sends back any report that is missing a field.
+- **Implementers and verifier.** Each unit has one implementing owner in its worktree and a separate verifier. Existing interactive or background sessions can fill those roles when their ownership is clear. The verifier first reads the goal, sources and final diff without the implementer's report, then checks the report's claims. Fixes return to the implementing owner.
 - **Reports are claims.** The orchestrator re-checks every report itself: CI at the reported SHA, acceptance commands, the diff.
 - **Profiles.** Project rules live in `~/.config/agent-orchestrate/profiles/<name>.md`: what workers may do, what always needs asking, what "ready" means. Keep profiles private if they name internal systems. See `skills/orchestrate/references/profile-template.md`.
 

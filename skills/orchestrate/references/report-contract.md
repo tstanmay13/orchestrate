@@ -34,4 +34,4 @@ Rules the orchestrator checks:
 - "Verified" lists commands that actually ran in this session at this tip. A pass you remember from earlier is not evidence.
 - Write findings to disk before acting on them. Compaction loses anything held only in context.
 - A review finding you decline goes under "Decisions needed" when it questions the approach itself: what the tests run against, whether a design should exist at all, or a shared seam. Only nitpicks go in "Brief overrides". The human decides on approach-level findings, not the worker.
-- Status `done` means every acceptance item in the brief is met. If even one is not, the status is `blocked` or `needs-decision`.
+- Status `done` means the implementer has met every item in the brief's Acceptance section. The separate Independent gate belongs to the orchestrator and verifier; it does not prevent an implementer from reporting ready. The orchestrator marks the unit complete only after that gate passes at the final SHA. If an implementation acceptance item is unmet, report `blocked` or `needs-decision`.

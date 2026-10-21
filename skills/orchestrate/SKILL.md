@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Run a multi-session job as its orchestrator. You plan, brief worker sessions, monitor them, verify their results, and loop the human in only for decisions. You never write the code yourself.
+description: Run a multi-session job with an orchestrator, parallel implementers, and an independent verifier. You plan and route work, check the evidence, and loop the human in for decisions. You never write the code yourself.
 disable-model-invocation: true
 argument-hint: "<goal, ticket, or 'resume <run>'>"
 license: MIT
@@ -10,7 +10,7 @@ metadata:
 
 # orchestrate
 
-You are the **orchestrator** for this job. Workers do the work. You own the plan, the briefs, the verification and the conversation with the human.
+You are the **orchestrator** for this job. Implementers do the work. A separate verifier challenges each completed unit. You own the plan, briefs, routing, evidence check and conversation with the human.
 
 Your hands stay off the work itself. You do not edit code, run builds in a worker's tree, push, or open PRs. When something needs doing, a worker does it. If no worker fits, you spawn a subagent in your own scratch space. Reading is always fine: run `gh pr view`, `gh pr checks`, `gh run view --log-failed`, and `git log` and `git show` on fetched refs. You can read files too. Investigating so you can write a good brief is orchestration. Doing the task is not.
 
@@ -20,13 +20,15 @@ Resolve the state root once per run: use `ORCHESTRATE_HOME` when set, otherwise 
 
 ```
 plan.md        goal, units, owners, order, decisions (append-only, dated)
-state.md       one table: unit | owner session | branch | tip | PR | status | last checked
+state.md       one table: unit | implementer | verifier | worktree | branch | tip | verified tip | PR | status | last checked
 briefs/NN-<unit>.md
 reports/NN-<unit>.md   written by workers, see references/report-contract.md
+verifications/NN-<unit>-<sha>.md   written by the verifier, see references/verifier.md
+verifier-context.md   what the verifier must know about the whole run: invariants, settled decisions, defect classes missed before, known open items
 lessons.md     corrections from this run; promote durable ones to the profile
 ```
 
-`<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md` and the newest reports, then go straight to the **Monitor** step.
+`<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step.
 
 ## The profile
 
@@ -50,7 +52,12 @@ Then list every **decision** that is the human's to make. These are product or a
 
 ### 2. Plan
 
-Split the work into **units**. A unit has one owner, one branch or worktree, and one reviewable question it answers. Units that touch the same files go to the same owner or run in sequence. Write `plan.md` and `state.md`. **Done when** every outcome maps to a unit, and every unit has an owner, a branch, an order, and acceptance criteria that a command or a URL can check.
+Split the work into **units**. A unit has one implementing owner, one branch or worktree, and one reviewable question it answers. Units that touch the same files go to the same owner or run in sequence. Assign a verifier and a verification depth (full or light, see [references/verifier.md](references/verifier.md)) to each unit. One verifier may cover the whole run, so it sees the seams between units, but it never verifies work it implemented. Write `plan.md`, `state.md` and `verifier-context.md`. **Done when** every outcome maps to a unit, and every unit has an implementer, a verifier, a depth, a branch, an order, and acceptance criteria that a command or a URL can check.
+
+Three reviews, three jobs. Don't run any of them twice:
+- **Implementer's final review** (the one the profile names): is the code written the way the team writes it? Checklist, contract shape, style. It runs before the PR opens or moves forward.
+- **Verifier**: does it actually hold? Threats, seams between units, premises, proof by failing test or trace.
+- **Orchestrator**: is the evidence real? Audit the verifier's report, don't redo it.
 
 ### 3. Brief
 
@@ -63,26 +70,30 @@ Hand each brief to an owner. First read [references/workers.md](references/worke
 - **Existing session:** if the human names a session, or the runtime’s agent listing shows an idle one that already owns the branch, use the available messaging capability. Give the brief path, profile path, report contract, and who to report to.
 - **New worker:** use native subagents when they support the required ownership, or a local worker process from the unit’s worktree. Put the user’s authorized scope and constraints in the brief. Launching a worker does not grant new permissions or bypass its sandbox.
 
-Record each owner’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership.
+Record each implementer’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership.
 
 ### 5. Monitor
 
 Use worker messages and completion notices when available. Otherwise check the runtime’s process handles, logs, and report files at a reasonable interval while the session remains active. Use external monitors or scheduled wakeups only when the host exposes them. Do not claim to keep monitoring after the turn ends without a supported mechanism. After each update, write `state.md` before routing more work.
 
-### 6. Verify
+### 6. Independent verification
 
-A report is a **claim**. For each one:
+A worker report is a **claim**, not a pass. Once an implementer reports the unit ready, send the verifier a request following [references/verifier.md](references/verifier.md): the depth, the brief, base and tip SHA, and the path to `verifier-context.md`. Its first pass comes from the goal, raw sources and diff, before it reads the implementer's report. Record its session ref and the SHA it reviewed in `state.md`. For a full-depth unit whose approach is still open to question, you may also ask for an approach-only pass on the first push, so a wrong direction is caught before the polish.
 
-- Check the evidence yourself. Read the CI result at the reported SHA, run the acceptance command in your scratch space or through a subagent, and read the diff.
-- Check that the report matches [references/report-contract.md](references/report-contract.md). Send back any report with missing fields.
-- Check every finding from an AI reviewer against the code before passing it on.
+Keep `verifier-context.md` current: when a lesson lands in `lessons.md` or a decision settles a finding, add it, so the verifier neither misses that class again nor re-raises a settled point.
+
+Then audit the evidence yourself:
+
+- The verified tip equals the PR head equals the SHA CI ran on. Relevant jobs actually ran.
+- Spot-check the verifier's findings against the code before routing them. Don't dismiss a disputed finding from either session without evidence.
+- Check the implementer's report against [references/report-contract.md](references/report-contract.md) and send back any report with missing fields.
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
-**Done when** each acceptance criterion has evidence that you saw first-hand.
+**Done when** each acceptance criterion has evidence you checked, and the verified tip in `state.md` equals the PR head. A green CI result or an implementer's own review cannot replace this gate. Any later push reopens it.
 
 ### 7. Route
 
-A defect belongs to the unit that **caused** it. Brief that unit's owner. The unit that found the defect adds only a regression test. When a worker reports a problem outside the job, record it as a non-blocking ticket draft and keep going. If a unit fails the same way twice, stop that unit and escalate.
+A defect belongs to the unit that **caused** it. Send the verifier's confirmed findings to that unit's implementer, who owns the fix and regression check. The verifier does not patch the branch. When the verifier's findings and an automated PR review land on the same unit, wait for both and send them as one batch, so they become one fix push. Every push can dismiss approvals and restart paid reviews. After the fix, check the new SHA and ask the verifier to recheck the changed behavior; repeat the full review if the approach or acceptance evidence changed. The unit that found a cross-unit defect adds only a regression test. When a worker reports a problem outside the job, record it as a non-blocking ticket draft and keep going. If a unit fails the same way twice, stop that unit and escalate.
 
 ### 8. Hand over for merge, with understanding
 
@@ -94,6 +105,8 @@ A PR goes to the human for merge only after they understand it. A green CI is no
 - the riskiest lines to read in review, with file:line
 
 Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then mark the PR ready or ask them to merge.
+
+After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 
 ### 9. Escalate
 
@@ -115,6 +128,7 @@ When every outcome is met, or blocked only on the human, write the closing repor
 
 - [references/brief-template.md](references/brief-template.md): the brief format
 - [references/report-contract.md](references/report-contract.md): what every worker report must contain
+- [references/verifier.md](references/verifier.md): independent verifier brief and report contract
 - [references/workers.md](references/workers.md): starting, messaging, pausing and stopping worker sessions
 - [references/lessons.md](references/lessons.md): failure modes seen in real runs. Read it once per run, before dispatch.
 - [references/merge-brief.md](references/merge-brief.md): what to explain before a human merges

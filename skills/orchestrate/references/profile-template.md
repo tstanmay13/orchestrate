@@ -4,7 +4,7 @@ A profile lives at `<state-root>/profiles/<name>.md`. Keep it in a private repo 
 
 If there is no profile, ask the human these four questions. Save their answers in the format below.
 
-1. Which models and effort should the orchestrator and the workers use?
+1. Which models and effort should the orchestrator, implementers and independent verifier use?
 2. What may workers do without asking? Push to their own branch? Open draft PRs? Reply to bot review comments? Update tickets?
 3. What must always be asked first? The default is comments: review replies, PR comments, tracker comments and ticket edits, plus merges, sign-off labels and anything public. Opening PRs and writing their bodies is not on this list by default.
 4. What does "ready" mean in this repo? Which checks, which review steps, which PR body rules?
@@ -17,7 +17,7 @@ Path: <main checkout>   Worktrees: <dir>   Base branch: <main>
 Repo rules: <pointer to CLAUDE.md/AGENTS.md; list only what agents tend to miss>
 
 ## Models
-Orchestrator: <model, effort>   Workers: <model, effort>
+Orchestrator: <model, effort>   Implementers: <model, effort>   Verifier: <model, effort>
 
 ## Standing permissions (workers may, without asking)
 - ...
