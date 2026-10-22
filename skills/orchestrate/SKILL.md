@@ -40,11 +40,7 @@ Before planning, look for a project profile at `<state-root>/profiles/<name>.md`
 
 Restate the goal as observable outcomes, such as "PR X merged with Y" or "ticket Z closed with evidence". Read the sources the human points at: the ticket, the PR, the earlier transcript.
 
-Then take the deeper version of the job, not a bigger one. Answer four questions in `plan.md` before you plan:
-1. What would a top practitioner in this field do here that the request doesn't ask for? Name the risks they would test against, not only the features they would build.
-2. What is the rawest material they would start from, instead of what has already been digested? Source code, specs and standards, real data and logs come first. Tickets, summaries and earlier reports are pointers, never evidence.
-3. Which specific methods and tools would they use to do the work and to check it?
-4. What, other than you or the workers, would show the result is right? A real user run, an outside client still working, production signals against a baseline, CI, an independent reviewer. These become acceptance criteria.
+Then take the deeper version of the job, not a bigger one: run steps 1 and 2 of [../deepen/SKILL.md](../deepen/SKILL.md) on the goal and write the four answers in `plan.md` before you plan. They name the risks to test, the raw sources, the methods and tools, and the outside evidence that becomes the acceptance criteria.
 
 Fold the answers into the units and briefs. Keep the scope the human asked for: depth changes how each unit is done and proven, not how many units there are.
 

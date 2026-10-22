@@ -14,6 +14,13 @@ Then:
 /orchestrate resume 2026-10-04-ticket-123
 ```
 
+`/deepen` is also available on its own. It turns any request into its deeper version before doing it: what a top practitioner would add, the rawest sources, their methods and tools, and the outside evidence that the result is right. `/orchestrate` runs it during intake.
+
+```
+/deepen suggest how we should rate limit the public API
+/deepen --rewrite-only write the migration plan
+```
+
 ## How it works
 
 - **Run directory.** Each job gets `~/.config/agent-orchestrate/runs/<run>/` (or `ORCHESTRATE_HOME`), with `plan.md`, `state.md`, `briefs/`, `reports/` and `lessons.md`. It sits outside every worktree, so every session can read it, and it survives compaction.

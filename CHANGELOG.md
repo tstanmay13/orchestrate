@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.1.3 — unreleased
+- New `/deepen` skill: answer the four depth questions for any request, rewrite it to ask for exactly that, then do it. `/orchestrate` intake now uses it instead of its own copy.
 - Plan from raw sources, concrete threats and evidence outside the implementer before splitting a job into units.
 - Give each unit a separate verifier with an independent first pass and a report tied to the reviewed SHA. Route fixes back to the implementing owner and recheck the changed result.
 - One verifier may cover a whole run, with a first pass per unit and a run-level `verifier-context.md` of invariants and defect classes missed before. Verification depth is full or light by risk. The implementer's final review, the verifier and the orchestrator each have one job. Verifier and automated review findings go out as one fix push. A post-merge step runs the checks that need a real environment.
