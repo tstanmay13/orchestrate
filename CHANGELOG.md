@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3 — unreleased
+## 0.1.3 — 2026-10-22
 - New `/deepen` skill: answer the four depth questions for any request, rewrite it to ask for exactly that, then do it. `/orchestrate` intake now uses it instead of its own copy.
 - Plan from raw sources, concrete threats and evidence outside the implementer before splitting a job into units.
 - Give each unit a separate verifier with an independent first pass and a report tied to the reviewed SHA. Route fixes back to the implementing owner and recheck the changed result.

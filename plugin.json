@@ -15,13 +15,14 @@
       "interface": {
         "displayName": "Orchestrate",
         "shortDescription": "Coordinate work across agents",
-        "longDescription": "Plan a job, give workers separate ownership, and verify their reports. Requires a local coding environment with worker or subagent capabilities. Supports Claude Code and Codex through runtime-specific guidance; cannot launch workers in plain Chat without those capabilities.",
+        "longDescription": "Plan a job, give workers separate ownership, and verify their reports. Also includes $deepen, which turns any request into its deeper version before doing it. Orchestrate requires a local coding environment with worker or subagent capabilities. Supports Claude Code and Codex through runtime-specific guidance; cannot launch workers in plain Chat without those capabilities.",
         "developerName": "Tanmay Singh",
         "category": "Productivity",
         "websiteURL": "https://github.com/tstanmay13/orchestrate",
         "supportURL": "https://github.com/tstanmay13/orchestrate/issues",
         "defaultPrompt": [
-          "Use $orchestrate to plan and coordinate this job across workers."
+          "Use $orchestrate to plan and coordinate this job across workers.",
+          "Use $deepen on this task."
         ],
         "brandColor": "#23364D",
         "composerIcon": "./assets/plugin-icon.svg",
