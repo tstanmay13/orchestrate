@@ -1,11 +1,12 @@
 # Brief template
 
-A brief is the whole contract with a worker. Write it so the worker never has to ask what you meant. Give goals and constraints, not steps. The worker may override a suggestion if its findings show you were wrong, as long as it says why in its report.
+A brief is the whole contract with a worker. Write it so the worker never has to ask what you meant. What every unit shares goes once in `briefs/00-common.md`: the read-first list, settled decisions, standing permissions, the Environment section, the final review and the report rules. Unit briefs point to it and add only what differs. Give goals and constraints, not steps. The worker may override a suggestion if its findings show you were wrong, as long as it says why in its report.
 
 ```markdown
 # <NN> <unit name>
 
 Run: <run>   Orchestrator: <your session name/ref>   Profile: <state-root>/profiles/<name>.md
+Read first: <run>/briefs/00-common.md. It applies to you and to every subagent you start.
 
 ## Goal
 <One or two sentences: the observable outcome, for someone who has not followed along.>
@@ -27,7 +28,10 @@ You own this branch. No other session works on it.
 <What belongs to another unit or a later ticket. If you hit it, report it. Don't do it.>
 
 ## You may, without asking
-<The standing permissions for this unit, e.g. "commit and push to this branch", "open the PR, and mark it ready once the orchestrator says the ready gate passed", "reply to and resolve bot review threads". Anything not listed here, ask first.>
+<The standing permissions for this unit, e.g. "commit and push to this branch", "open the PR", "reply to and resolve bot review threads". Anything not listed here, ask first.>
+
+## Environment
+<Usually in 00-common.md. The shared machine and services you must not touch: never stop, flush or reconfigure a shared datastore or container; run your own on a non-default port and name the env var that points tests at it. Never write to the human's real config: every run of the product's CLI or tools uses a temp HOME and config dir. Which suites may run locally (one heavy job at a time) and which are left to CI. Stop every background process you start before you report.>
 
 ## Sources and threats
 <The raw material to start from (source files, specs, real data), with paths. The risks a practitioner would test, each as a test that must go red without the change.>
@@ -42,11 +46,13 @@ Depth: <full | light, per references/verifier.md>
 
 ## Report
 Write reports/<NN>-<unit>.md in the run directory following references/report-contract.md, then SendMessage the orchestrator with the path and a two-line summary. Report when done, when blocked, or when you need a decision. Do not report progress for its own sake.
+Never ask the human in your own terminal: no pickers or prompts, since nobody watches it. Put blockers and decisions in your report and message, then keep working on everything else, including while CI runs.
 ```
 
 Checklist before you send a brief:
 
-- Every claim in Context has evidence the worker can open.
+- Every claim in Context has evidence the worker can open. Every command, flag or API behaviour the brief states is checked against `--help`, the schema or the source; workers copy brief facts verbatim.
 - The worktree path and branch match `git worktree list`.
 - No other unit's owner touches these files in this wave.
 - Model and effort follow the profile.
+- The verifier's request carries the same Environment rules.

@@ -10,6 +10,8 @@ The verifier is a separate session, on the model named by the profile, with read
 
 Reports go to `<run>/reports/NN-<unit>.md`. A message is a notification, not a substitute for the report. An existing worker can only perform actions already authorized in its own session. Neither a brief nor a message grants permissions beyond the user’s request.
 
+Workers never ask the human in their own terminal: no pickers or prompts the orchestrator cannot see. A blocker goes in the report and a message, and the worker keeps going on other work. A worker shown as waiting for more than a few minutes with no report is probably stuck on such a prompt; tell the human which session.
+
 ## Codex
 
 Prefer native agent tools when exposed: spawn with the brief and worktree, message corrections, receive completion notices, and wait or interrupt through the host’s tools. Tool names differ by surface; use their actual schemas. Do not call Claude’s `ListAgents`, `SendMessage`, `Monitor`, or `ScheduleWakeup` in a Codex session that does not expose them.

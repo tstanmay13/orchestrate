@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4 — 2026-10-27
+- A run-wide `briefs/00-common.md` that every unit brief points to, and an Environment section in the brief: shared services workers must not touch, never write the human's real config, stop background processes.
+- Sweep every open PR (checks, mergeable state, threads, review bodies) before each status message. The merge gate adds "merges cleanly with its base" and "final-review tip equals the PR head".
+- Report evidence rules: run checks exactly as CI does, paste test output for a claimed fix or pass, use the real binary for anything a person sees.
+- Check every premise at its source before putting a decision to the human or recommending an option.
+- Workers never ask in their own terminal; blockers go in the report and a message.
+- Promote each lesson when it is written, not at Close, and read the last few runs' lessons at intake.
+- Draft status is not part of either gate. The automated review loop may start once the final review is done, in parallel with the verifier. The understanding check scales to risk.
+
 ## 0.1.3 — 2026-10-22
 - New `/deepen` skill: answer the four depth questions for any request, rewrite it to ask for exactly that, then do it. `/orchestrate` intake now uses it instead of its own copy.
 - Plan from raw sources, concrete threats and evidence outside the implementer before splitting a job into units.

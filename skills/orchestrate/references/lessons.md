@@ -16,6 +16,8 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 - **A merge forward silently dropped tests and reverted a parent's fixes.** Practice: after every merge forward, compare test counts with the parent and diff the parent's last changes.
 - **An AI reviewer's findings were passed on without checking.** Practice: verify every finding against the code. Some will be wrong.
 - **A test run overwrote the human's real tool config, and a stale binary from one run poisoned the next.** Practice: point test runs at a temp HOME or config path, and rebuild before each trial.
+- **A worker reported "lint clean" after linting only the files it touched, and CI went red.** Practice: run each check exactly as CI runs it, and paste the output.
+- **The orchestrator put a decision to the human on a premise true for only one consumer, and recommended a security change without tracing stored state.** Practice: check every premise at its source before asking or recommending.
 
 ## Instructions
 
@@ -23,6 +25,10 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 - **"Hold off committing" was read as "stop working".** Practice: say which hold you mean.
 - **A worker refused an action because the approval came from the orchestrator and not from the human.** That refusal is correct. Practice: put every permission a unit needs in the launch prompt or the brief before you dispatch.
 - **A worker lost a dozen triaged review findings to compaction.** Practice: write findings to disk first, then act on them.
+
+## Shared machine
+
+- **Workers and verifiers stopped a shared database to take its port, flushed a shared cache from a test fixture, ran a full frontend suite that ran the machine out of memory, and left a background loop running.** Practice: every brief, and every verifier request, carries an Environment section from `briefs/00-common.md`.
 
 ## Irreversible actions
 
@@ -33,8 +39,13 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 ## Startup
 
 - **A background worker failed at startup and left no transcript.** It never showed up in the peer list, and the orchestrator didn't notice for half an hour. Practice: about a minute after dispatch, confirm every new worker is `working` (`claude agents --json --all`) and appears in `ListAgents`. Subscribe to its idle notice only after it appears.
+- **A worker waited most of a day on a picker in its own terminal, which nobody was watching.** Practice: workers never ask in their own terminal; blockers go in the report and a message.
 - **A subagent's research was posted as fact and was wrong.** Practice: research from a subagent is a claim too. Check it against the source before it goes into a brief or anything others read.
 
 ## Review findings
 
 - **A reviewer flagged, in every round, that a test suite ran only against a hand-written fake of another service, and the worker declined it as out of scope.** The orchestrator read the report and passed on the summary without surfacing that finding. The human found the same problem a day later. Practice: approach-level findings a worker declines go straight to the human.
+
+## Lessons
+
+- **Lessons were promoted only at Close, most runs never reached Close, and the same lessons recurred across a dozen runs.** Practice: promote each lesson when it is written, and read the last few runs' lessons at intake.

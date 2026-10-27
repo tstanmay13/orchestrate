@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "<goal, ticket, or 'resume <run>'>"
 license: MIT
 metadata:
-  version: 0.1.3
+  version: 0.1.4
 ---
 
 # orchestrate
@@ -20,12 +20,13 @@ Resolve the state root once per run: use `ORCHESTRATE_HOME` when set, otherwise 
 
 ```
 plan.md        goal, units, owners, order, decisions (append-only, dated)
-state.md       one table: unit | implementer | verifier | worktree | branch | tip | verified tip | PR | status | last checked
-briefs/NN-<unit>.md
+state.md       one table: unit | implementer | verifier | worktree | branch | tip | verified tip | final-review tip | PR | status | last checked
+briefs/00-common.md   what every unit shares: read-first list, settled decisions, permissions, environment rules, report path
+briefs/NN-<unit>.md   only what differs for that unit; points to 00-common.md
 reports/NN-<unit>.md   written by workers, see references/report-contract.md
 verifications/NN-<unit>-<sha>.md   written by the verifier, see references/verifier.md
 verifier-context.md   what the verifier must know about the whole run: invariants, settled decisions, defect classes missed before, known open items
-lessons.md     corrections from this run; promote durable ones to the profile
+lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
 ```
 
 `<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step.
@@ -38,13 +39,13 @@ Before planning, look for a project profile at `<state-root>/profiles/<name>.md`
 
 ### 1. Intake
 
-Restate the goal as observable outcomes, such as "PR X merged with Y" or "ticket Z closed with evidence". Read the sources the human points at: the ticket, the PR, the earlier transcript.
+Restate the goal as observable outcomes, such as "PR X merged with Y" or "ticket Z closed with evidence". Read the sources the human points at: the ticket, the PR, the earlier transcript. Read the `lessons.md` of the last few runs under `<state-root>/runs/` (and the legacy runs directory) that used this profile, and carry any lesson not yet promoted into `00-common.md` and `verifier-context.md`.
 
 Then take the deeper version of the job, not a bigger one: run steps 1 and 2 of [../deepen/SKILL.md](../deepen/SKILL.md) on the goal and write the four answers in `plan.md` before you plan. They name the risks to test, the raw sources, the methods and tools, and the outside evidence that becomes the acceptance criteria.
 
 Fold the answers into the units and briefs. Keep the scope the human asked for: depth changes how each unit is done and proven, not how many units there are.
 
-Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
+Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Before you ask or recommend, check every premise of the question at its source (code, a command, a doc) and in every consumer of that fact, not the first one found. A premise you could not check is named as open in the picker. Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
 
 ### 2. Plan
 
@@ -57,7 +58,7 @@ Three reviews, three jobs. Don't run any of them twice:
 
 ### 3. Brief
 
-Write one brief per unit from [references/brief-template.md](references/brief-template.md). Give the goal, the constraints and the acceptance criteria. Leave out the step-by-step. Put everything the worker may do without asking in the brief, because a worker cannot take approval relayed from another session. Name the exact worktree path and branch. A branch name on its own is only a label. **Done when** a worker could finish the unit from the brief and the profile alone.
+Write `briefs/00-common.md` first, then one brief per unit from [references/brief-template.md](references/brief-template.md). Give the goal, the constraints and the acceptance criteria. Leave out the step-by-step. Put everything the worker may do without asking in the brief, because a worker cannot take approval relayed from another session. Name the exact worktree path and branch. A branch name on its own is only a label. A rule that changes mid-run goes into `00-common.md` with its date, and each live worker acknowledges it before relying on it. **Done when** a worker could finish the unit from the brief and the profile alone.
 
 ### 4. Dispatch
 
@@ -72,11 +73,13 @@ Record each implementer’s session ref or process handle in `state.md`, not jus
 
 Use worker messages and completion notices when available. Otherwise check the runtime’s process handles, logs, and report files at a reasonable interval while the session remains active. Use external monitors or scheduled wakeups only when the host exposes them. Do not claim to keep monitoring after the turn ends without a supported mechanism. After each update, write `state.md` before routing more work.
 
+Before every status message to the human, sweep every open PR in the run, not only the one in focus: each check by name (red ones with cause and owner), whether it merges cleanly with its base, unresolved threads and new review bodies, and the head SHA against the verified and final-review tips in `state.md`. "CI running" is not a status. A PR that conflicts with its base gets no PR workflows, so an expected automated review will not start. A worker that shows waiting with no report is blocked until proven otherwise.
+
 ### 6. Independent verification
 
 A worker report is a **claim**, not a pass. Once an implementer reports the unit ready, send the verifier a request following [references/verifier.md](references/verifier.md): the depth, the brief, base and tip SHA, and the path to `verifier-context.md`. Its first pass comes from the goal, raw sources and diff, before it reads the implementer's report. Record its session ref and the SHA it reviewed in `state.md`. For a full-depth unit whose approach is still open to question, you may also ask for an approach-only pass on the first push, so a wrong direction is caught before the polish.
 
-Keep `verifier-context.md` current: when a lesson lands in `lessons.md` or a decision settles a finding, add it, so the verifier neither misses that class again nor re-raises a settled point.
+Keep `verifier-context.md` current: when a lesson lands in `lessons.md` or a decision settles a finding, add it (and propose the lesson's promotion, step 10), so the verifier neither misses that class again nor re-raises a settled point.
 
 Then audit the evidence yourself:
 
@@ -87,8 +90,8 @@ Then audit the evidence yourself:
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
 There are two gates:
-- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. When it passes, the PR leaves draft: the implementer marks it ready, or opens it as ready if it isn't open yet. Draft status is not a hold. Start any automated PR review loop the profile names right away, in parallel with CI. Neither waits for the other.
-- **Merge gate**: each acceptance criterion has evidence you checked, the verified tip in `state.md` equals the PR head, CI is green there, the automated review loop has finished, and no review thread is unanswered. Then go to step 8.
+- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. Record it in `state.md`. Draft status is not part of either gate. Any automated PR review loop the profile names may start once the implementer's final review is done, in parallel with the verifier and CI; its findings join the verifier's in one fix batch.
+- **Merge gate**: each acceptance criterion has evidence you checked; the verified tip and the final-review tip in `state.md` both equal the PR head; the PR merges cleanly with its base; CI is green there; the automated review loop has finished; and no review thread is unanswered. If the head moved after a review, that review reruns on what changed. Then go to step 8.
 
 A green CI result or an implementer's own review cannot replace the verifier. A push that changes behaviour reopens both gates for what it changed.
 
@@ -105,7 +108,7 @@ A PR goes to the human for merge only after they understand it. A green CI is no
 - the decisions made along the way and the alternatives rejected
 - the riskiest lines to read in review, with file:line
 
-Then check understanding instead of asking "any questions?". Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge, and only once the merge gate in step 6 has passed. Readiness for review is the ready gate in step 6, not this step.
+Then check understanding instead of asking "any questions?". Scale the check to the risk; the profile may limit it to risky PRs. Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge, and only once the merge gate in step 6 has passed. Readiness for review is the ready gate in step 6, not this step.
 
 After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 
@@ -123,7 +126,7 @@ Send them as one batch of pickers with your recommendation and the evidence. Use
 
 ### 10. Close
 
-When every outcome is met, or blocked only on the human, write the closing report: what changed (with links), what was verified and how, what is still open, and what the human needs to do. Append corrections from this run to `lessons.md`, and propose the durable ones as edits to the profile. Stop your wakeups and monitors. Tell owners they are done so they can be stopped.
+When every outcome is met, or blocked only on the human, write the closing report: what changed (with links), what was verified and how, what is still open, and what the human needs to do. Lessons are promoted as they are written, not here: a generic one becomes a proposed edit to this skill's `references/lessons.md`, a project one a proposed edit to the profile's Lessons. At Close, check none was missed. If the run stops before Close, they are still proposed. Stop your wakeups and monitors. Tell owners they are done so they can be stopped.
 
 ## Reference
 

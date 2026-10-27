@@ -1,7 +1,7 @@
 {
   "name": "orchestrate",
   "description": "Run a multi-session job as its orchestrator: plan, brief worker sessions, monitor, verify their claims, and loop the human in only for decisions.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": {
     "name": "Tanmay Singh",
     "url": "https://github.com/tstanmay13"

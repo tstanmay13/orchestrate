@@ -22,7 +22,7 @@ The orchestrator names the depth in the request. The verifier may raise it and m
    - the settled decisions and invariants every unit must keep true;
    - the classes of defect missed before in this run or project, taken from `lessons.md`;
    - known open items, which are not to be re-reported unless they got worse.
-2. **The unit**: the original brief and goal, the profile, raw sources (code, specs, real data), acceptance criteria, base and exact tip SHA. Use a read-only checkout or a scratch worktree of its own.
+2. **The unit**: the original brief and goal, the profile, raw sources (code, specs, real data), acceptance criteria, base and exact tip SHA, and the Environment rules from `briefs/00-common.md`. Use a read-only checkout or a scratch worktree of its own.
 3. **Only after the first-pass verdict is written down**: the implementer's report, the PR body, and earlier review conclusions.
 
 ## How to check

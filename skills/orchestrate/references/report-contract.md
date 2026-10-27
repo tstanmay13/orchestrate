@@ -35,6 +35,9 @@ Branch: <branch>   Tip: <full SHA, pushed? yes/no>   PR: <url or none>
 Rules the orchestrator checks:
 
 - "Verified" lists commands that actually ran in this session at this tip. A pass you remember from earlier is not evidence.
+- Each check runs exactly as CI runs it: the same command, paths, flags and package scope. A linter or type check over the touched files only is not a pass.
+- A finding reported as fixed, or a check reported as passing, carries the pasted test output at the new tip. A checkbox is not evidence.
+- A claim about anything a person sees (output, an error, ordering, a retry) comes from a run of the real binary or service. A fake or harness pass is labelled as one.
 - Write findings to disk before acting on them. Compaction loses anything held only in context.
 - A review finding you decline goes under "Decisions needed" when it questions the approach itself: what the tests run against, whether a design should exist at all, or a shared seam. Only nitpicks go in "Brief overrides". The human decides on approach-level findings, not the worker.
 - Every unresolved review thread appears under "Open review threads" with an answer. A thread with no answer means the status is not `done`.
