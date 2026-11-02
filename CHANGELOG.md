@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Close marks the run finished with a `**Closed:** YYYY-MM-DD` line under `# State` in `state.md`; resuming the run removes it. Tools that list runs can now skip finished ones.
+
 ## 0.1.4 — 2026-10-27
 - A run-wide `briefs/00-common.md` that every unit brief points to, and an Environment section in the brief: shared services workers must not touch, never write the human's real config, stop background processes.
 - Sweep every open PR (checks, mergeable state, threads, review bodies) before each status message. The merge gate adds "merges cleanly with its base" and "final-review tip equals the PR head".

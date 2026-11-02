@@ -29,7 +29,7 @@ verifier-context.md   what the verifier must know about the whole run: invariant
 lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
 ```
 
-`<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step.
+`<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step. If `state.md` has a `**Closed:**` line, remove it: the run is open again.
 
 ## The profile
 
@@ -126,7 +126,7 @@ Send them as one batch of pickers with your recommendation and the evidence. Use
 
 ### 10. Close
 
-When every outcome is met, or blocked only on the human, write the closing report: what changed (with links), what was verified and how, what is still open, and what the human needs to do. Lessons are promoted as they are written, not here: a generic one becomes a proposed edit to this skill's `references/lessons.md`, a project one a proposed edit to the profile's Lessons. At Close, check none was missed. If the run stops before Close, they are still proposed. Stop your wakeups and monitors. Tell owners they are done so they can be stopped.
+When every outcome is met, or blocked only on the human, write the closing report: what changed (with links), what was verified and how, what is still open, and what the human needs to do. Lessons are promoted as they are written, not here: a generic one becomes a proposed edit to this skill's `references/lessons.md`, a project one a proposed edit to the profile's Lessons. At Close, check none was missed. If the run stops before Close, they are still proposed. Then mark the run finished: add `**Closed:** YYYY-MM-DD` on the line after `# State` in `state.md`, so tools that list runs can tell it is done. Stop your wakeups and monitors. Tell owners they are done so they can be stopped.
 
 ## Reference
 
