@@ -1,6 +1,12 @@
 # Changelog
 
 ## Unreleased
+- Verifier: each finding states whether a caller can reach it today; tests are asked for only when a realistic bug in the changed code survives the existing tests and would matter if it shipped. Unreachable cases are nits with no test.
+- Verifier: a planted bug in the changed lines is the standard check of test strength. A surviving bug is the finding; otherwise no new test is asked for.
+- Verifier: the first pass also skips the PR body, title and commit messages, and requests do not describe the change as safe.
+- Verifier: a new session every five or six units or at compaction, with `verifier-context.md` carrying the run's memory.
+- Merge gate: re-read the PR head right before the merge brief; commits after the pass go back to the verifier.
+- Close: a verifier scorecard counted from one `F<n>` line per finding, including escapes and test-to-code size.
 - Close marks the run finished with a `**Closed:** YYYY-MM-DD` line under `# State` in `state.md`; resuming the run removes it. Tools that list runs can now skip finished ones.
 - Each unit's `status` cell in `state.md` starts with one word (`needs-you`, `ready`, `working`, `waiting`, `paused`, `merged`, `dropped`), and a run-wide question goes on a `**Needs you:**` line. Tools can show what needs the human across runs without asking for a pulse check.
 

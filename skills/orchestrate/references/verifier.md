@@ -6,6 +6,8 @@ The verifier tests a completed unit from outside its implementation session. Its
 
 One verifier session may cover every unit in a run, in sequence. That is how it learns the seams between units, which is where findings often sit. Each unit still starts with its own first pass from the goal and the diff. If the verifier has already seen an implementer's reasoning for a unit (its report, its replies, a review it took part in), that unit gets a fresh verifier session. The verifier reports only to the orchestrator and never messages implementers.
 
+A long session also gets worse with length: an LLM's reliability drops as its context fills with similar diffs, and it holds on to early conclusions. So start a new verifier session every five or six units, or whenever the current one compacts, whichever comes first. The run's memory carries over in `verifier-context.md`, not in the transcript: before the handover, the outgoing verifier adds the seams, invariants and defect classes it learned to that file.
+
 ## Depth
 
 Match the depth to the risk, so the gate is never skipped by hand:
@@ -23,7 +25,7 @@ The orchestrator names the depth in the request. The verifier may raise it and m
    - the classes of defect missed before in this run or project, taken from `lessons.md`;
    - known open items, which are not to be re-reported unless they got worse.
 2. **The unit**: the original brief and goal, the profile, raw sources (code, specs, real data), acceptance criteria, base and exact tip SHA, and the Environment rules from `briefs/00-common.md`. Use a read-only checkout or a scratch worktree of its own.
-3. **Only after the first-pass verdict is written down**: the implementer's report, the PR body, and earlier review conclusions.
+3. **Only after the first-pass verdict is written down**: the implementer's report, the PR body and title, commit messages, and earlier review conclusions. On the first pass, read the change through `git diff`, not `git log` or `gh pr view`. Text that calls a change safe measurably lowers what an LLM reviewer finds, so the orchestrator's request does not describe the change as fine or small either; it names the goal and the depth.
 
 ## How to check
 
@@ -38,6 +40,8 @@ The orchestrator names the depth in the request. The verifier may raise it and m
   - Open review threads: list the PR's unresolved threads at this tip yourself and compare with the implementer's list. A thread with no answer, or one marked fixed that the code doesn't fix, is a finding.
 - **Proof.** Every finding comes with a failing test, a scratch run, a trace with file:line, or a CI log line. Anything argued only by reasoning is marked unproven.
 - **Classes, not instances.** When one instance of a defect turns up, look for its siblings and its root.
+- **Test strength by planted bug.** To judge whether the tests are strong enough, change a changed line the way a realistic bug would (flip a condition, drop a check, swap an argument), run the tests, and restore the file (`git status` clean). If a test goes red, the tests cover that behaviour and no new test is asked for. If nothing goes red, that surviving bug is the finding, and its fix is one test that kills it. Skip lines where no bug would matter: logging, metrics, tracing, timing and copy.
+- **Likelihood.** Every finding says whether a caller that exists today can reach it, and how. Ask for a test only when both hold: a realistic bug in the changed code would get past the existing tests, and it would matter if it shipped. A case that nothing can reach today, an input the types or an upstream validator already rule out, or exact prose wording, is a nit: one line, no test. Suggest the smallest fix, preferably a row in an existing table test rather than a new test file.
 
 It must not edit the implementer's tree, commit, push, open a PR, comment, label or merge. A verifier finding is still a claim: the orchestrator checks it before routing a fix.
 
@@ -57,7 +61,8 @@ Base: <full SHA>   Reviewed tip: <full SHA>   Verifier session: <stable ref>   S
 <Exact commands and results with counts, CI job links at this SHA, source paths and lines. Say which you observed and which you read from another report.>
 
 ## Findings
-<Ranked blocking / should-fix / nit. Each: file:line, what goes wrong and when, proof or "unproven", the acceptance item or invariant it breaks, suggested fix. Empty if none.>
+<Ranked blocking / should-fix / nit. Each: file:line, what goes wrong and when, who can reach it today, proof or "unproven", the acceptance item or invariant it breaks, suggested fix. Empty if none. End each finding with one line the orchestrator can count:
+`F<n> | <blocking|should-fix|nit> | <reachable|unreachable> | <proved|unproven> | <cross-unit|unit>`>
 
 ## Claims checked
 <After the first pass: the implementer's report and earlier review conclusions against the evidence. Name every mismatch.>
