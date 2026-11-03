@@ -41,6 +41,7 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 - **A background worker failed at startup and left no transcript.** It never showed up in the peer list, and the orchestrator didn't notice for half an hour. Practice: about a minute after dispatch, confirm every new worker is `working` (`claude agents --json --all`) and appears in `ListAgents`. Subscribe to its idle notice only after it appears.
 - **A worker waited most of a day on a picker in its own terminal, which nobody was watching.** Practice: workers never ask in their own terminal; blockers go in the report and a message.
 - **A subagent's research was posted as fact and was wrong.** Practice: research from a subagent is a claim too. Check it against the source before it goes into a brief or anything others read.
+- **A research claim about "the runtime" was applied to a component that runs a different path, and a precedent named in a brief turned out to behave the other way.** Practice: when a system has more than one runtime path, name the path in the claim and confirm the subject takes it. Read the file:line of any precedent before citing it in a brief or decision.
 
 ## Review findings
 
