@@ -44,4 +44,8 @@ Finish the plan and briefs and state that dispatch requires a local environment 
 
 ## Holding
 
-Write whether a hold means "keep working, but do not push" or "stop and wait". Never leave it as just "hold".
+Write whether a hold means "keep working, but do not push" or "stop and wait". Never leave it as just "hold". A hold on the push also covers the PR body.
+
+## Starting a run
+
+The orchestrate skill is reserved for the human to invoke; the model cannot start it. When the human asks for a run, give them the exact `/orchestrate ...` line, or a prompt file that starts with it, to paste.

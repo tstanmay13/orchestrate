@@ -23,6 +23,7 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 
 - **The brief offered two options, and the worker took the weaker one.** Practice: name the option you want, and why.
 - **"Hold off committing" was read as "stop working".** Practice: say which hold you mean.
+- **A worker held its push as told, but edited the live PR body to match the held commit.** The verifier then flagged the body as contradicting the files. Practice: a hold on the push is also a hold on the PR body; say both.
 - **A worker refused an action because the approval came from the orchestrator and not from the human.** That refusal is correct. Practice: put every permission a unit needs in the launch prompt or the brief before you dispatch.
 - **A worker lost a dozen triaged review findings to compaction.** Practice: write findings to disk first, then act on them.
 
@@ -41,6 +42,7 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 - **A background worker failed at startup and left no transcript.** It never showed up in the peer list, and the orchestrator didn't notice for half an hour. Practice: about a minute after dispatch, confirm every new worker is `working` (`claude agents --json --all`) and appears in `ListAgents`. Subscribe to its idle notice only after it appears.
 - **A worker waited most of a day on a picker in its own terminal, which nobody was watching.** Practice: workers never ask in their own terminal; blockers go in the report and a message.
 - **A subagent's research was posted as fact and was wrong.** Practice: research from a subagent is a claim too. Check it against the source before it goes into a brief or anything others read.
+- **An outside-practice claim from research was relayed to the human as fact, and the source did not support it.** Practice: a research claim reaches the human only after one quote has been opened at its URL, or it is marked "from research, not opened".
 - **A research claim about "the runtime" was applied to a component that runs a different path, and a precedent named in a brief turned out to behave the other way.** Practice: when a system has more than one runtime path, name the path in the claim and confirm the subject takes it. Read the file:line of any precedent before citing it in a brief or decision.
 
 ## Review findings
