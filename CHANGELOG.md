@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Close marks the run finished with a `**Closed:** YYYY-MM-DD` line under `# State` in `state.md`; resuming the run removes it. Tools that list runs can now skip finished ones.
+- Each unit's `status` cell in `state.md` starts with one word (`needs-you`, `ready`, `working`, `waiting`, `paused`, `merged`, `dropped`), and a run-wide question goes on a `**Needs you:**` line. Tools can show what needs the human across runs without asking for a pulse check.
 
 ## 0.1.4 — 2026-10-27
 - A run-wide `briefs/00-common.md` that every unit brief points to, and an Environment section in the brief: shared services workers must not touch, never write the human's real config, stop background processes.

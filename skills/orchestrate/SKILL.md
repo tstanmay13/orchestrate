@@ -29,6 +29,8 @@ verifier-context.md   what the verifier must know about the whole run: invariant
 lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
 ```
 
+Each `status` cell starts with one word, then a colon and a short note: `needs-you` (blocked on the human; the note is the ask, in one line), `ready` (merge gate met, waiting for the human to merge), `working` (owners are on it, including red CI), `waiting` (on another unit or an outside PR), `paused`, `merged` or `dropped`. A question for the human that is not about one unit goes on a `**Needs you:** <ask>` line after `# State`; remove it once answered. Tools read these words to show the human what needs them across runs, so set `needs-you` before you send the message that asks, and change it back once answered.
+
 `<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step. If `state.md` has a `**Closed:**` line, remove it: the run is open again.
 
 ## The profile
@@ -71,7 +73,7 @@ Record each implementer’s session ref or process handle in `state.md`, not jus
 
 ### 5. Monitor
 
-Use worker messages and completion notices when available. Otherwise check the runtime’s process handles, logs, and report files at a reasonable interval while the session remains active. Use external monitors or scheduled wakeups only when the host exposes them. Do not claim to keep monitoring after the turn ends without a supported mechanism. After each update, write `state.md` before routing more work.
+Use worker messages and completion notices when available. Otherwise check the runtime’s process handles, logs, and report files at a reasonable interval while the session remains active. Use external monitors or scheduled wakeups only when the host exposes them. Do not claim to keep monitoring after the turn ends without a supported mechanism. After each update, write `state.md`, status word included, before routing more work.
 
 Before every status message to the human, sweep every open PR in the run, not only the one in focus: each check by name (red ones with cause and owner), whether it merges cleanly with its base, unresolved threads and new review bodies, and the head SHA against the verified and final-review tips in `state.md`. "CI running" is not a status. A PR that conflicts with its base gets no PR workflows, so an expected automated review will not start. A worker that shows waiting with no report is blocked until proven otherwise.
 
