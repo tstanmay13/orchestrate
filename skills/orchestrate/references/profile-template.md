@@ -19,6 +19,9 @@ Repo rules: <pointer to CLAUDE.md/AGENTS.md; list only what agents tend to miss>
 ## Models
 Orchestrator: <model, effort>   Implementers: <model, effort>   Verifier: <model, effort>
 
+## Dispatch
+<orchestrator (it starts workers itself) or human (it hands the human a launch block per unit)>
+
 ## Standing permissions (workers may, without asking)
 - ...
 
