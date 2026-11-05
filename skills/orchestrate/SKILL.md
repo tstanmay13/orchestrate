@@ -20,7 +20,7 @@ Resolve the state root once per run: use `ORCHESTRATE_HOME` when set, otherwise 
 
 ```
 plan.md        goal, units, owners, order, decisions (append-only, dated)
-state.md       one table: unit | implementer | verifier | worktree | branch | tip | verified tip | final-review tip | PR | status | last checked
+state.md       two tables, ## Units and ## Workers, see below
 briefs/00-common.md   what every unit shares: read-first list, settled decisions, permissions, environment rules, report path
 briefs/NN-<unit>.md   only what differs for that unit; points to 00-common.md
 reports/NN-<unit>.md   written by workers, see references/report-contract.md
@@ -29,7 +29,43 @@ verifier-context.md   what the verifier must know about the whole run: invariant
 lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
 ```
 
-Each `status` cell starts with one word, then a colon and a short note: `needs-you` (blocked on the human; the note is the ask, in one line), `ready` (merge gate met, waiting for the human to merge), `working` (owners are on it, including red CI), `waiting` (on another unit or an outside PR), `paused`, `merged` or `dropped`. A question for the human that is not about one unit goes on a `**Needs you:** <ask>` line after `# State`; remove it once answered. Tools read these words to show the human what needs them across runs, so set `needs-you` before you send the message that asks, and change it back once answered.
+Tools read `state.md` to show the human a board of the run, so keep this shape exactly:
+
+```
+# State
+**Needs you:** <ask>          only while a run-wide question is open
+
+## Units
+| unit | stage | status | PR | branch | implementer | verifier | worktree | tip | verified tip | final-review tip | last checked |
+
+## Workers
+| worker | role | session | worktree | units | status |
+```
+
+**Units** has one row per PR, or per deliverable that has no PR, such as a posted comment. Write the unit cell as a short id and a name: `A2 access-write`. Do not add summary rows for a stack or an owner. The board builds stacks from each PR's base branch, and each stacked PR keeps its own row.
+
+**Workers** has one row per session: implementers, verifiers and live-run workers. `role` is `implementer`, `verifier` or `worker`. `units` lists the ids of the units the session owns. A session that has not started yet, such as one waiting for the human to paste its launch line, is a worker row with `needs-you`. It is not a unit row.
+
+`stage` is the gate a unit is at now, as one word:
+- `build`: the implementer is writing the change.
+- `self-check`: the implementer is running its final review.
+- `ai-review`: the profile's automated review loop is running.
+- `verify`: the verifier is on it, for a first pass or a recheck.
+- `fix`: findings or red CI are being fixed.
+- `merge`: the merge gate is met, or the merge brief has been sent.
+- `real-run`: merged, and the "Needs a real run" list is still open.
+- `done`.
+
+When two gates run at once, write the one that will finish last. Change the stage whenever you change the status.
+
+Each `status` cell, in both tables, starts with one word, then a colon and a note of about 60 characters at most. The words are:
+- `needs-you`: blocked on the human. The note is the ask.
+- `ready`: the merge gate is met and the unit is waiting for the human to merge.
+- `working`: owners are on it, including fixing red CI.
+- `waiting`: blocked on another unit or an outside PR. The note names it, as in `waiting: after W4 #17268`.
+- `paused`, `merged` or `dropped`.
+
+Longer context goes in `plan.md` or the reports, not in the cell. A question for the human that is not about one unit goes on the `**Needs you:**` line. When nothing is open, delete that line; don't write "nothing open". Tools use these words to show the human what needs them across runs. So set `needs-you` before you send the message that asks, and change it back once the human answers.
 
 `<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step. If `state.md` has a `**Closed:**` line, remove it: the run is open again.
 
