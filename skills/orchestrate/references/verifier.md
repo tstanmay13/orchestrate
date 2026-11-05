@@ -38,6 +38,11 @@ The orchestrator names the depth in the request. The verifier may raise it and m
   - Which concrete counterexample, regression, missing case or unsupported claim remains?
   - For each class in the run context, does this unit have it?
   - Open review threads: list the PR's unresolved threads at this tip yourself and compare with the implementer's list. A thread with no answer, or one marked fixed that the code doesn't fix, is a finding.
+- **Doc drift (required).** Docs that should have changed but sit outside the diff are invisible to a diff read, so look for them:
+  1. Grep every changed or removed identifier and string literal across the profile's doc roots. Each stale hit is a finding.
+  2. For every doc line in the diff, and every claim in the PR body, that states a rule ("a test fails...", "every X does Y"), find the enforcing code and confirm it holds, exceptions included.
+  3. Every URL or doc link the change adds or emits resolves to a repo file or a reachable page.
+  Proof of the pass: once per run, plant one stale doc line on a scratch branch, show this pass flags it, and record that in the verification file.
 - **Proof.** Every finding comes with a failing test, a scratch run, a trace with file:line, or a CI log line. Anything argued only by reasoning is marked unproven.
 - **Classes, not instances.** When one instance of a defect turns up, look for its siblings and its root.
 - **Test strength by planted bug.** To judge whether the tests are strong enough, change a changed line the way a realistic bug would (flip a condition, drop a check, swap an argument), run the tests, and restore the file (`git status` clean). If a test goes red, the tests cover that behaviour and no new test is asked for. If nothing goes red, that surviving bug is the finding, and its fix is one test that kills it. Skip lines where no bug would matter: logging, metrics, tracing, timing and copy.

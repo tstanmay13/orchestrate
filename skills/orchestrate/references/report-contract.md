@@ -20,7 +20,7 @@ Branch: <branch>   Tip: <full SHA, pushed? yes/no>   PR: <url or none>
 <Every unresolved thread on the PR at this tip (`gh api graphql` reviewThreads, isResolved false), human and bot. For each: link, one line on what it asks, and its answer: fixed at <sha>, a reply drafted under "Drafts for the human", or a question under "Decisions needed". "None" only after checking.>
 
 ## Decisions needed
-<Each as a question with options and your recommendation. Leave empty if there are none.>
+<Each as a question with options and your recommendation. For each option, start with its impact on the people who use the product: who notices, and what they see or can't do. Next state its production impact: what could break or degrade, any stored-data or irreversible effect, how a failure would show up, and how it is rolled back. Then give the technical detail. A blocker states what users face while it stays blocked. Leave empty if there are none.>
 
 ## Drafts for the human
 <Comments meant for a tracker or a review thread, ready to paste, each labelled with where it goes. Write them in the voice the profile names. Do not post these yourself unless the profile allows it.>

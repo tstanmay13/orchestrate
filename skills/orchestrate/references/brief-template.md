@@ -36,6 +36,9 @@ You own this branch. No other session works on it.
 ## Sources and threats
 <The raw material to start from (source files, specs, real data), with paths. The risks a practitioner would test, each as a test that must go red without the change.>
 
+## Docs in the same change
+Before the self-check, list every identifier, user-visible string, error code or reason, field, command, tool name, URL and behaviour the change adds, renames, removes or changes. Grep each across the doc roots the profile names. Update every hit in this PR, and refresh any "Last verified" line you touched. What you can't fix goes under "Docs not updated" in the PR body, with file:line. A "no docs impact" declaration needs the greps in your report. Check PR body claims like docs: no "every" or "always" the code doesn't enforce.
+
 ## Acceptance
 <Checks the implementer owns that a command or a URL can settle: test commands with expected results, CI green at the tip, PR body validator passes.>
 <If the profile names a final review, it runs over the final diff after the last code change, before the PR is created or moved forward.>

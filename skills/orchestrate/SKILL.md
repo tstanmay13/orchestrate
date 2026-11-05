@@ -47,7 +47,7 @@ Then take the deeper version of the job, not a bigger one: run steps 1 and 2 of 
 
 Fold the answers into the units and briefs. Keep the scope the human asked for: depth changes how each unit is done and proven, not how many units there are.
 
-Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Before you ask or recommend, check every premise of the question at its source (code, a command, a doc) and in every consumer of that fact, not the first one found. A premise you could not check is named as open in the picker. Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
+Then list every **decision** that is the human's to make. These are product or architecture choices, scope cuts, and anything irreversible beyond the standing permissions. Before you ask or recommend, check every premise of the question at its source (code, a command, a doc) and in every consumer of that fact, not the first one found. A premise you could not check is named as open in the picker. Work out each decision from the user's side before the code's: what changes for the people who use the product under each option. Then work out what changes for production: what could break or degrade, how it would show up, and how it would be rolled back. The picker leads with that (see step 9). Ask all of them at once with structured pickers, putting your recommendation first. **Done when** no unit depends on an open decision.
 
 ### 2. Plan
 
@@ -94,7 +94,7 @@ Then audit the evidence yourself:
 
 There are two gates:
 - **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. Record it in `state.md`. Draft status is not part of either gate. Any automated PR review loop the profile names may start once the implementer's final review is done, in parallel with the verifier and CI; its findings join the verifier's in one fix batch.
-- **Merge gate**: each acceptance criterion has evidence you checked; the verified tip and the final-review tip in `state.md` both equal the PR head, which you read again with `gh pr view --json headRefOid` right before the merge brief (a commit added after the pass, including a merge from the base or a "small" fix, goes back to the verifier for those commits); the PR merges cleanly with its base; CI is green there; the automated review loop has finished; and no review thread is unanswered. If the head moved after a review, that review reruns on what changed. Then go to step 8.
+- **Merge gate**: each acceptance criterion has evidence you checked; the verified tip and the final-review tip in `state.md` both equal the PR head, which you read again with `gh pr view --json headRefOid` right before the merge brief (a commit added after the pass, including a merge from the base or a "small" fix, goes back to the verifier for those commits); the PR merges cleanly with its base; CI is green there; a doc-drift pass is recorded in the verification for the head; the automated review loop has finished; and no review thread is unanswered. If the head moved after a review, that review reruns on what changed. Then go to step 8.
 
 A green CI result or an implementer's own review cannot replace the verifier. A push that changes behaviour reopens both gates for what it changed.
 
@@ -125,7 +125,13 @@ Loop the human in only for these:
 - a unit that has failed twice
 - instructions that contradict each other
 
-Send them as one batch of pickers with your recommendation and the evidence. Use a push notification if one is available. This applies to you as well as to workers. Everything else waits until the closing report.
+Send them as one batch of pickers with your recommendation and the evidence. Frame each blocker or question from the side of the people who use the product. State the impact on them first: who notices, what they see or can't do under each option, and what happens to them while it stays unanswered. Next state the production impact:
+- what could break, degrade or cost more, and for which services;
+- whether it touches stored data or anything that can't be undone;
+- how a failure would be noticed, and who gets paged;
+- how it is rolled back, and how long that takes.
+
+Then give the technical detail. If an option has no user or production impact, say so plainly rather than leaving it out. Use a push notification if one is available. This applies to you as well as to workers. Everything else waits until the closing report.
 
 ### 10. Close
 
