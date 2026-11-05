@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- A ready unit goes back to `working` / `fix` in `state.md` as soon as a comment, commit, red CI or conflict reopens it, before the work is routed.
 - Merge handover: the unit's row is set to `ready` and `merge` (with both tips at the head) before the brief is sent, and the brief is saved as `merge-briefs/<unit id>.md`. A brief sent first left the board showing the unit as still in self-check.
 - `state.md` has a `## Units` table, with one row per PR and a new `stage` column (`build`, `self-check`, `ai-review`, `verify`, `fix`, `merge`, `real-run`, `done`), and a `## Workers` table, with one row per session. Stack and owner summary rows are gone, and status notes stay under about 60 characters. The job board groups units by stage, and it builds stacks from the PRs' base branches.
 - Verifier: each finding states whether a caller can reach it today; tests are asked for only when a realistic bug in the changed code survives the existing tests and would matter if it shipped. Unreachable cases are nits with no test.

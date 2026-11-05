@@ -141,7 +141,7 @@ A defect belongs to the unit that **caused** it. Send the verifier's confirmed f
 
 ### 8. Hand over for merge, with understanding
 
-A PR goes to the human for merge only after they understand it. A green CI is not enough. Before you send a brief, update the unit's row in `state.md`: set the status to `ready`, the stage to `merge`, and both the verified tip and the final-review tip to the head SHA. The board shows only what `state.md` says, so a brief sent before that update leaves the unit looking unfinished. Save the brief as `merge-briefs/<unit id>.md` in the run directory. For each PR, write a **merge brief** from [references/merge-brief.md](references/merge-brief.md):
+A PR goes to the human for merge only after they understand it. A green CI is not enough. Before you send a brief, update the unit's row in `state.md`: set the status to `ready`, the stage to `merge`, and both the verified tip and the final-review tip to the head SHA. The board shows only what `state.md` says, so a brief sent before that update leaves the unit looking unfinished. Save the brief as `merge-briefs/<unit id>.md` in the run directory. A unit leaves `ready` the moment anything reopens it: a review comment that asks for a change (the human's included), a new commit, red CI, or a conflict with its base. Set its status back to `working` and its stage to `fix` in `state.md` before you route the work, so the board stops offering it for merge. For each PR, write a **merge brief** from [references/merge-brief.md](references/merge-brief.md):
 - what was wrong or missing before, and what is observably different after
 - how it works, walked through one concrete example
 - what was tested, how, and why that test is the right one, plus what is still unverified
