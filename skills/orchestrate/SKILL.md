@@ -25,6 +25,7 @@ briefs/00-common.md   what every unit shares: read-first list, settled decisions
 briefs/NN-<unit>.md   only what differs for that unit; points to 00-common.md
 reports/NN-<unit>.md   written by workers, see references/report-contract.md
 verifications/NN-<unit>-<sha>.md   written by the verifier, see references/verifier.md
+merge-briefs/<unit id>.md   the merge brief sent to the human, see step 8
 verifier-context.md   what the verifier must know about the whole run: invariants, settled decisions, defect classes missed before, known open items
 lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
 ```
@@ -140,7 +141,7 @@ A defect belongs to the unit that **caused** it. Send the verifier's confirmed f
 
 ### 8. Hand over for merge, with understanding
 
-A PR goes to the human for merge only after they understand it. A green CI is not enough. For each PR, write a **merge brief** from [references/merge-brief.md](references/merge-brief.md):
+A PR goes to the human for merge only after they understand it. A green CI is not enough. Before you send a brief, update the unit's row in `state.md`: set the status to `ready`, the stage to `merge`, and both the verified tip and the final-review tip to the head SHA. The board shows only what `state.md` says, so a brief sent before that update leaves the unit looking unfinished. Save the brief as `merge-briefs/<unit id>.md` in the run directory. For each PR, write a **merge brief** from [references/merge-brief.md](references/merge-brief.md):
 - what was wrong or missing before, and what is observably different after
 - how it works, walked through one concrete example
 - what was tested, how, and why that test is the right one, plus what is still unverified
