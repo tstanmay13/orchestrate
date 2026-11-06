@@ -38,7 +38,7 @@ Orchestrator: <model, effort>   Implementers: <model, effort>   Verifier: <model
 <Tracker, when to comment, status rules, where to file out-of-scope findings>
 
 ## Branching and stacks
-<Merge forward vs rebase, force-push policy, who owns stack operations>
+<Merge forward vs rebase, force-push policy, who owns stack operations. Whether dependent PRs use the `gh-stack` skill, and which of its commands workers may run. `push`, `submit` and `sync` push with `--force-with-lease`, and `rebase` rewrites history.>
 
 ## Voice
 <Skill or style guide for text the human will post under their own name, if any>

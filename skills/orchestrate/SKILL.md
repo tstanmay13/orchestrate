@@ -88,7 +88,22 @@ Then list every **decision** that is the human's to make. These are product or a
 
 ### 2. Plan
 
-Split the work into **units**. A unit has one implementing owner, one branch or worktree, and one reviewable question it answers. Units that touch the same files go to the same owner or run in sequence. Assign a verifier and a verification depth (full or light, see [references/verifier.md](references/verifier.md)) to each unit. One verifier may cover the whole run, so it sees the seams between units, but it never verifies work it implemented. Write `plan.md`, `state.md` and `verifier-context.md`. **Done when** every outcome maps to a unit, and every unit has an implementer, a verifier, a depth, a branch, an order, and acceptance criteria that a command or a URL can check.
+Split the work into **units**. A unit has one implementing owner, one branch or worktree, and one reviewable question it answers. Units that touch the same files go to the same owner or run in sequence. Assign a verifier and a verification depth (full or light, see [references/verifier.md](references/verifier.md)) to each unit. One verifier may cover the whole run, so it sees the seams between units, but it never verifies work it implemented. **Build in chunks, not all at once.** Group units into **waves** by what they depend on.
+- **Wave 1** is the foundation: the units that later units build on, plus independent research.
+- **A later unit starts only when what it depends on is settled.** That means its parent PR merged, or the interface it uses is reviewed and frozen in `plan.md`, so it isn't rebuilt when an earlier review changes the shape.
+- **Keep a wave small.** Usually two or three implementers at once, so reviews, fixes and merges keep up and later PRs aren't reworked over and over.
+- **Each later wave has a start condition** in `plan.md`: "starts when A1 merges" or "starts when the B interface in plan.md is approved". Brief it when the condition is met, not at intake.
+
+**Dependent PRs go in a stack.** When units build on each other, use the `gh-stack` skill when it's available, so each PR shows only its layer and merges in order. Follow the profile's branching rules for how the stack is updated (rebase or merge forward) and who runs stack operations.
+
+**Write down the seams.** For every pair of units where one consumes what the other produces, `plan.md` names:
+- the interface: a function, a file, a schema or a command;
+- who owns it;
+- how a change to it is announced.
+
+A unit that changes a seam messages you before pushing, and you update the brief of every unit that consumes it. Workers may message each other directly about a seam, with you copied, instead of relaying everything through you.
+
+Write `plan.md`, `state.md` and `verifier-context.md`. **Done when** every outcome maps to a unit, and every unit has an implementer, a verifier, a depth, a branch, a wave with its start condition, and acceptance criteria that a command or a URL can check.
 
 Three reviews, three jobs. Don't run any of them twice:
 - **Implementer's final review** (the one the profile names): is the code written the way the team writes it? Checklist, contract shape, style. It runs before the PR opens or moves forward.
@@ -107,7 +122,7 @@ Hand each brief to an owner. First read [references/workers.md](references/worke
 - **New worker:** use native subagents when they support the required ownership, or a local worker process from the unit’s worktree. Put the user’s authorized scope and constraints in the brief. Launching a worker does not grant new permissions or bypass its sandbox.
 - **Human launches:** when the profile says `Dispatch: human`, do not start any implementer or verifier yourself, by subagent, background process or otherwise. For each unit, give the human one command line to paste, chained with `&&`: fetch the base, create the worktree and branch, `cd` into it, and open a named session there (`<run>-<unit>`, with the unit's model). Do not ask the human to paste a first prompt. Once the session shows up in the agent listing under that name, send it the first prompt yourself with SendMessage. The prompt names the profile, brief, report path, report contract and asks the session to acknowledge you. Then wait for the acknowledgment and keep its ref. Subagents for your own research are still fine.
 
-Record each implementer’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership.
+Record each implementer’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership. Dispatch only the current wave. When a later wave's start condition is met, write its briefs from what the earlier waves actually merged, not from the intake plan, then dispatch it.
 
 ### 5. Monitor
 

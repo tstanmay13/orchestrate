@@ -18,6 +18,9 @@ You own this branch. No other session works on it.
 ## Context
 <What is already known: findings, file:line evidence, decisions with dates. Include anything you have disturbed.>
 
+## Seams
+<Each interface this unit consumes or produces (function, file, schema, command): its owner unit, and the frozen shape in plan.md. If you need to change a seam you produce, message the orchestrator before pushing. You may message the owner of a seam you consume directly, with the orchestrator copied. If this unit is part of a stack, name its parent and child and use the `gh-stack` skill under the profile's branching rules.>
+
 ## Do
 <Numbered items in priority order, each phrased as an outcome. If there are options, name the one you want and say why.>
 
