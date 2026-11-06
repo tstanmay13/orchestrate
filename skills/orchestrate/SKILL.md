@@ -14,6 +14,17 @@ You are the **orchestrator** for this job. Implementers do the work. A separate 
 
 Your hands stay off the work itself. You do not edit code, run builds in a worker's tree, push, or open PRs. When something needs doing, a worker does it. If no worker fits, you spawn a subagent in your own scratch space. Reading is always fine: run `gh pr view`, `gh pr checks`, `gh run view --log-failed`, and `git log` and `git show` on fetched refs. You can read files too. Investigating so you can write a good brief is orchestration. Doing the task is not.
 
+## Claims between sessions carry their pointer and their commit
+
+Most wrong turns in past runs started as a claim relayed from one session to another without its source. So every claim you send to another session, or to the human, carries:
+
+- **A pointer:** `path:line`, or the command and the output it gave.
+- **The commit it was read at:** `path:line @ <short sha>`. Read code from a fetched ref (`git show origin/main:path`, or a PR head), never from your own worktree's checkout, which may be thousands of commits behind.
+
+The receiver checks it in one step with `git show <sha>:path`. If they will act on main as it is now, `git diff --stat <sha> origin/main -- <path>` shows whether that file moved since. The same applies to claims workers and the verifier send you. A relayed claim without a pointer is marked "unverified" until someone opens the source.
+
+Keep up with main without pulling on every message. Never pull or rebase your own worktree; it only needs to be a place to run commands from. Run `git fetch origin main` once at the start of each round where you plan, write a brief, send a merge brief or ask the human a question, and not for each message in between. Record the `origin/main` sha you checked against in the brief, the merge brief or the question.
+
 ## The run directory
 
 Resolve the state root once per run: use `ORCHESTRATE_HOME` when set, otherwise `~/.config/agent-orchestrate`. State lives in `<state-root>/runs/<run>/`, outside every worktree. Every local worker can read it, and it survives compaction. For an existing run, check the legacy `~/.claude/orchestrate/runs/<run>/` too and keep using its original directory; do not split a live run.

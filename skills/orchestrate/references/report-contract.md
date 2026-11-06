@@ -34,6 +34,7 @@ Branch: <branch>   Tip: <full SHA, pushed? yes/no>   PR: <url or none>
 
 Rules the orchestrator checks:
 
+- Every claim about code carries `path:line @ <short sha>`, read from a fetched ref, and every claim about behaviour carries the command and its output. A claim passed on from another session keeps its original pointer, or is marked "unverified".
 - "Verified" lists commands that actually ran in this session at this tip. A pass you remember from earlier is not evidence.
 - Each check runs exactly as CI runs it: the same command, paths, flags and package scope. A linter or type check over the touched files only is not a pass.
 - A finding reported as fixed, or a check reported as passing, carries the pasted test output at the new tip. A checkbox is not evidence.
