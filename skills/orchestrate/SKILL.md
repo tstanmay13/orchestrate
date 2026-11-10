@@ -141,6 +141,8 @@ Use worker messages and completion notices when available. Otherwise check the r
 
 Before every status message to the human, sweep every open PR in the run, not only the one in focus: each check by name (red ones with cause and owner), whether it merges cleanly with its base, unresolved threads and new review bodies, and the head SHA against the verified and final-review tips in `state.md`. "CI running" is not a status. A PR that conflicts with its base gets no PR workflows, so an expected automated review will not start. A worker that shows waiting with no report is blocked until proven otherwise.
 
+Start that sweep with `python3 -I scripts/sweep.py --repo <checkout>` (path relative to this skill). It reads every active run's `state.md`, fetches the main branch once, and lists the units ready for the human, every Needs you line, rows whose PR is already merged, ready units whose branch moved past their ready SHA, and ready units whose changed files also changed on main since their gate. Fix the stale rows and recheck those units before you report. The script does not read CI, so check the PRs it lists with the host's tools.
+
 ### 6. Independent verification
 
 A worker report is a **claim**, not a pass. Once an implementer reports the unit ready, send the verifier a request following [references/verifier.md](references/verifier.md): the depth, the brief, base and tip SHA, and the path to `verifier-context.md`. Its first pass comes from the goal, raw sources and diff, before it reads the implementer's report. Record its session ref and the SHA it reviewed in `state.md`. For a full-depth unit whose approach is still open to question, you may also ask for an approach-only pass on the first push, so a wrong direction is caught before the polish.
