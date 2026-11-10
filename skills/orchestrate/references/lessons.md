@@ -49,3 +49,10 @@ Each lesson is something that went wrong in a multi-session run, followed by the
 ## Lessons
 
 - **Lessons were promoted only at Close, most runs never reached Close, and the same lessons recurred across a dozen runs.** Practice: promote each lesson when it is written, and read the last few runs' lessons at intake.
+
+## Verification (beta-readiness, Nov 2026)
+
+- **A client and its server route were verified separately, and the verifier's "real posts" used its own headers.** The CLI never sent the organization header, so crash reports never arrived until a live dev test. Practice: for any client-to-route unit, one test sends the client's own request, headers included, through the real route.
+- **Monitors passed review by reading, yet Datadog rejected one query and eight full definitions** (options were never validated). Practice: validate the whole committed artifact (query plus options) with the vendor's validator, and list what was validated.
+- **A step that posts to Datadog merged with "no key on PR runs"; the secret was environment-scoped, so the first scheduled run on main sent nothing.** Practice: when a secret blocks a PR run, check where it is defined and that the real trigger can read it, before merge.
+- **The orchestrator handed a worker a docs sentence that was false after the first run, and the worker changed behaviour to match it.** Practice: check a user-facing sentence against the contract in every state before handing it over; when a docs line is false, fix the line, not the agreed behaviour.

@@ -29,6 +29,7 @@ The orchestrator names the depth in the request. The verifier may raise it and m
 
 ## How to check
 
+- Client-to-route units: at least one test sends the client's own request (headers included) through the real route. Monitors-as-code: validate every full definition with the vendor's validator, not only the query.
 - **Diff range.** Review `git diff origin/<base>...<tip>`, never a range across a merge from the base, because that feeds the base's own commits to the review. On a fix round, review the fix commits against their first parent, then the units they touch.
 - **Size.** Check the size and every changed file, not only source: `gh pr view --json additions,changedFiles` or `git diff --stat`. Fixtures, snapshots and generated files hide behaviour and bloat.
 - **Questions:**
