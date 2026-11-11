@@ -97,6 +97,77 @@ def parse_state(run: str, text: str) -> tuple[bool, list[str], list[Unit]]:
     return closed, needs, units
 
 
+SESSION = re.compile(r"^(?P<name>[\w.-]+)\s*(?P<ref>\[[0-9a-f]{4,}\])?")
+
+
+def _unit_key(name: str) -> str:
+    return name.split()[0] if name.split() else name
+
+
+DATED_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-")
+
+
+def closeable_sessions(run: str, text: str, units: list[Unit], closed: bool) -> list[str]:
+    """Worker sessions with nothing left to do, as `name [ref]`.
+
+    A run with a Workers table (worker, session, units, status) is trusted only by each row's own
+    status: done, dropped or "can be closed". Rows go stale when a worker is reused, so its units
+    are not used to guess. A run without one is read from the units table's implementer and
+    verifier columns: a session is free when every unit it appears on is merged, done or dropped.
+    In a closed run every named worker is free. Names with no session ref and no dated run prefix
+    are skipped as notes, not sessions."""
+    finished = {_unit_key(u.name): u.state in FINISHED for u in units}
+    refs: dict[str, str] = {}
+    free: set[str] = set()
+    holds: dict[str, list[bool]] = {}
+    has_workers = any(
+        line.startswith("|") and {"worker", "status"} <= {c.lower() for c in cells(line)}
+        for line in text.splitlines()
+    )
+
+    def note(name: str, ref: str) -> str | None:
+        ref = ref.strip().strip("[]")
+        if re.fullmatch(r"[0-9a-f]{4,}", ref or ""):
+            refs[name] = ref
+        elif not DATED_NAME.match(name):
+            return None
+        return name
+
+    header: list[str] | None = None
+    for line in text.splitlines():
+        if not line.startswith("|"):
+            header = None
+            continue
+        row = cells(line)
+        if header is None:
+            header = [c.lower() for c in row]
+            continue
+        if set("".join(row)) <= set("-: "):
+            continue
+        get = align(header, row)
+        if "worker" in header and "status" in header:
+            name = note(get.get("worker", "").split()[0] if get.get("worker") else "", get.get("session", ""))
+            if not name or "stray" in get.get("worker", ""):
+                continue
+            status = get.get("status", "").lower()
+            word = re.match(r"[a-z-]+", status.strip())
+            if closed or (word and word.group(0) in FINISHED) or "can be closed" in status:
+                free.add(name)
+        elif "unit" in header and not has_workers:
+            key = _unit_key(get.get("unit", ""))
+            for column in ("implementer", "verifier"):
+                found = SESSION.match(get.get(column, "").strip())
+                if not found:
+                    continue
+                name = note(found.group("name"), found.group("ref") or "")
+                if name:
+                    holds.setdefault(name, []).append(finished.get(key, False))
+    for name, held in holds.items():
+        if closed or (held and all(held)):
+            free.add(name)
+    return sorted(f"{n} [{refs[n]}]" if n in refs else n for n in free)
+
+
 class Git:
     def __init__(self, repo: pathlib.Path, main: str) -> None:
         self.repo, self.main = repo, main
@@ -137,8 +208,11 @@ def active_runs(root: pathlib.Path, days: float, names: list[str]) -> list[pathl
 
 def sweep(git: Git, runs: list[pathlib.Path], fetch: bool) -> list[str]:
     parsed = []
+    free: list[str] = []
     for run in runs:
-        closed, needs, units = parse_state(run.name, (run / "state.md").read_text())
+        text = (run / "state.md").read_text()
+        closed, needs, units = parse_state(run.name, text)
+        free += [f"{run.name}: {who}" for who in closeable_sessions(run.name, text, units, closed)]
         if not closed:
             parsed.append((run.name, needs, units))
     units = [u for _, _, us in parsed for u in us]
@@ -185,6 +259,9 @@ def sweep(git: Git, runs: list[pathlib.Path], fetch: bool) -> list[str]:
     waiting = [u for u in units if u.pr and u.pr not in merged and u.state not in FINISHED]
     out.append("\nOpen PRs to check for CI (not checked here)")
     out.append("- " + (" ".join(sorted({f"#{u.pr}" for u in waiting})) or "none"))
+
+    out.append("\nSessions you can close (their units are finished)")
+    out += [f"- {line}" for line in free] or ["- none"]
 
     counts: dict[str, dict[str, int]] = {}
     for u in units:

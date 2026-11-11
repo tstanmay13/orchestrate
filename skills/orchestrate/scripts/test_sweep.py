@@ -112,3 +112,52 @@ class AgainstGit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+WORKERS = """# State
+## Units
+| unit | stage | status | PR | branch |
+|---|---|---|---|---|
+| 01 a | done | merged: abc1234 | #17101 | t/a |
+| 02 b | verify | ready: 1111111 green | #17102 | t/b |
+
+## Workers
+| worker | role | session | worktree | units | status |
+|---|---|---|---|---|---|
+| run-01 | implementer | [aaa111] | wt/a | 01 | working: idle |
+| run-02 | implementer | [bbb222] | wt/b | 02 | working: fixing |
+| run-00 | worker | [ccc333] | wt/c | 00 | dropped: done, session can be closed |
+| run-v | verifier | [ddd444] | wt/v | 01 02 | working: queue |
+"""
+
+INLINE = """| unit | implementer | verifier | status | PR |
+|---|---|---|---|---|
+| 01 a | run-i1 [eee555] | run-v1 [fff666] | merged: x | #17201 |
+| 02 b | run-i2 [abc777] | run-v1 [fff666] | working: y | #17202 |
+"""
+
+
+class Closeable(unittest.TestCase):
+    def test_workers_table(self):
+        _, _, units = sweep.parse_state("r", WORKERS)
+        got = sweep.closeable_sessions("r", WORKERS, units, closed=False)
+        self.assertEqual(got, ["run-00 [ccc333]"])  # a Workers row is trusted only by its own status
+
+    def test_inline_implementer_and_verifier_columns(self):
+        _, _, units = sweep.parse_state("r", INLINE)
+        got = sweep.closeable_sessions("r", INLINE, units, closed=False)
+        self.assertEqual(got, ["run-i1 [eee555]"])
+
+    def test_closed_run_frees_everyone(self):
+        _, _, units = sweep.parse_state("r", INLINE)
+        got = sweep.closeable_sessions("r", INLINE, units, closed=True)
+        self.assertEqual(got, ["run-i1 [eee555]", "run-i2 [abc777]", "run-v1 [fff666]"])
+
+
+    def test_no_duplicates_or_junk_names(self):
+        text = WORKERS.replace("| run-01 | implementer | [aaa111] | wt/a | 01 | working: idle |",
+                               "| run-01 | implementer | [aaa111] | wt/a | 01 | done: finished |\n| orch | x | - | - | 01 | done |")
+        text += "\n| unit | implementer | status | PR |\n|---|---|---|---|\n| 01 a | run-01 | merged: x | #17101 |\n"
+        _, _, units = sweep.parse_state("r", text)
+        got = sweep.closeable_sessions("r", text, units, closed=False)
+        self.assertEqual(got, ["run-00 [ccc333]", "run-01 [aaa111]"])
