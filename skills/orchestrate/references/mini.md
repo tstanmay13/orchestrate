@@ -9,6 +9,16 @@
 
 Use the full mode for anything bigger, for work that runs across days, or when the human wants to drive a unit themselves. A mini run can switch to the full mode at any point: give the launch line for that unit's worktree and branch, then continue with a session instead of the subagent. Record the switch in `plan.md`.
 
+## Its own worktree
+
+A mini run's session starts in a worktree of its own, never in the main checkout or another run's worktree. Under `Dispatch: human` the human opens it; otherwise give them this line (one `&&` chain, after the profile's conventions for branch and worktree paths):
+
+```sh
+git -C <repo> fetch origin main && git -C <repo> worktree add <repo>-worktrees/<run> -b <prefix>/<slug> origin/main && cd <repo>-worktrees/<run> && claude -n <run> --model <orchestrator model>
+```
+
+Then the human types `/orchestrate mini <brief path or goal>`. With one unit, that unit's implementer works in this worktree and branch. With more, each other unit gets its own worktree, created by its implementer.
+
 ## Dispatch in a mini run
 
 Asking for mini mode is the human's go-ahead to spawn subagents for this run, even when the profile says `Dispatch: human`. Write `Mode: mini (<who>, <date>)` at the top of `plan.md`. Every other profile rule still holds: the standing permissions, what always needs asking, models, PR conventions and reviews.
