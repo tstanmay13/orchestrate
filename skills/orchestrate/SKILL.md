@@ -74,7 +74,7 @@ When two gates run at once, write the one that will finish last. Change the stag
 
 Each `status` cell, in both tables, starts with one word, then a colon and a note of about 60 characters at most. The words are:
 - `needs-you`: blocked on the human. The note is the ask.
-- `ready`: the merge gate is met and the unit is waiting for the human to merge.
+- `ready`: ready to send to a reviewer for approval. Every gate on our side has passed (the merge gate in step 6), so all that is left is a person's approval and the human's merge. The note says what it waits on, such as `ready: needs approval` or `ready: approved, merge`.
 - `working`: owners are on it, including fixing red CI.
 - `waiting`: blocked on another unit or an outside PR. The note names it, as in `waiting: after W4 #17268`.
 - `paused`, `merged` or `dropped`.
@@ -182,6 +182,8 @@ A PR goes to the human for merge only after they understand it. A green CI is no
 - the riskiest lines to read in review, with file:line
 
 Then check understanding instead of asking "any questions?". Scale the check to the risk; the profile may limit it to risky PRs. Ask the human two or three short questions their answer would show they've got it, such as "what happens if X?", and fill gaps from their answers. Done when the human can say in their own words what the PR changes, how it was proven, and what could still go wrong. Only then ask them to merge, and only once the merge gate in step 6 has passed. Readiness for review is the ready gate in step 6, not this step.
+
+In every status message, list `ready` units under **Ready to send for approval**, with the PR link and who should approve when the repo or profile names one (a code owner, a team). The human sends each to that reviewer and merges once it is approved. A unit still missing any gate of ours is not in that list, even if its CI is green.
 
 After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 

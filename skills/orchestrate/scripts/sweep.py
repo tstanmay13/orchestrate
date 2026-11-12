@@ -1,7 +1,7 @@
 """Sweep every active run's state.md and check its claims against git.
 
 Prints, for the human:
-- units whose status starts with "ready" (PR, sha, run), and every "**Needs you:**" line;
+- units whose status starts with "ready", meaning ready to send for approval (PR, sha, run), and every "**Needs you:**" line;
 - stale rows: a unit not marked merged/done/dropped whose PR is already on the main branch;
 - recheck rows: a ready unit whose branch tip moved past the sha in its ready line, or whose
   changed files were also changed on main after its gate sha;
@@ -230,7 +230,7 @@ def sweep(git: Git, runs: list[pathlib.Path], fetch: bool) -> list[str]:
     head = git("rev-parse", "--short=11", f"origin/{git.main}").strip()
     out.append(f"origin/{git.main} at {head}; runs: {', '.join(n for n, _, _ in parsed) or 'none'}")
 
-    out.append("\nReady for the human")
+    out.append("\nReady to send for approval")
     recheck: list[str] = []
     for u in ready:
         if u.pr in merged:

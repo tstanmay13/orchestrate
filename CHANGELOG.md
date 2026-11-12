@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- `ready` now means ready to send to a reviewer for approval: every gate of ours has passed, and only a person's approval and the human's merge are left. Status messages and `sweep.py` list these units as "Ready to send for approval".
 - Mini mode: `/orchestrate mini <goal>` runs the same workflow (deepen, plan, briefs, final review, independent verifier, both gates, merge brief, merge watcher) in one session, with a fresh implementer subagent per unit and a separate verifier subagent. Asking for it overrides `Dispatch: human` for that run. `sweep.py` leaves `subagent` workers out of the sessions to close.
 - A ready unit goes back to `working` / `fix` in `state.md` as soon as a comment, commit, red CI or conflict reopens it, before the work is routed.
 - Merge handover: the unit's row is set to `ready` and `merge` (with both tips at the head) before the brief is sent, and the brief is saved as `merge-briefs/<unit id>.md`. A brief sent first left the board showing the unit as still in self-check.
