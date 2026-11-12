@@ -115,7 +115,8 @@ def closeable_sessions(run: str, text: str, units: list[Unit], closed: bool) -> 
     are not used to guess. A run without one is read from the units table's implementer and
     verifier columns: a session is free when every unit it appears on is merged, done or dropped.
     In a closed run every named worker is free. Names with no session ref and no dated run prefix
-    are skipped as notes, not sessions."""
+    are skipped as notes, not sessions, and so are a mini run's subagents (session `subagent`),
+    which end with the run instead of being closed by the human."""
     finished = {_unit_key(u.name): u.state in FINISHED for u in units}
     refs: dict[str, str] = {}
     free: set[str] = set()
@@ -147,7 +148,7 @@ def closeable_sessions(run: str, text: str, units: list[Unit], closed: bool) -> 
         get = align(header, row)
         if "worker" in header and "status" in header:
             name = note(get.get("worker", "").split()[0] if get.get("worker") else "", get.get("session", ""))
-            if not name or "stray" in get.get("worker", ""):
+            if not name or "stray" in get.get("worker", "") or get.get("session", "").startswith("subagent"):
                 continue
             status = get.get("status", "").lower()
             word = re.match(r"[a-z-]+", status.strip())

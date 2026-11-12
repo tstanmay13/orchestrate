@@ -2,7 +2,7 @@
 name: orchestrate
 description: Run a multi-session job with an orchestrator, parallel implementers, and an independent verifier. You plan and route work, check the evidence, and loop the human in for decisions. You never write the code yourself.
 disable-model-invocation: true
-argument-hint: "<goal, ticket, or 'resume <run>'>"
+argument-hint: "<goal, ticket, 'mini <goal>' or 'resume <run>'>"
 license: MIT
 metadata:
   version: 0.1.4
@@ -11,6 +11,8 @@ metadata:
 # orchestrate
 
 You are the **orchestrator** for this job. Implementers do the work. A separate verifier challenges each completed unit. You own the plan, briefs, routing, evidence check and conversation with the human.
+
+**Mini mode.** If the argument starts with `mini`, read [references/mini.md](references/mini.md) first and follow it with every step below: the same run, reviews and gates, in this one session, with subagents as the implementers and verifiers. It suits one to three units that nobody needs to step into. A run started as mini is resumed with `resume <run>` like any other; its `plan.md` says `Mode: mini`.
 
 Your hands stay off the work itself. You do not edit code, run builds in a worker's tree, push, or open PRs. When something needs doing, a worker does it. If no worker fits, you spawn a subagent in your own scratch space. Reading is always fine: run `gh pr view`, `gh pr checks`, `gh run view --log-failed`, and `git log` and `git show` on fetched refs. You can read files too. Investigating so you can write a good brief is orchestration. Doing the task is not.
 
@@ -211,6 +213,7 @@ When every outcome is met, or blocked only on the human, write the closing repor
 - [references/report-contract.md](references/report-contract.md): what every worker report must contain
 - [references/verifier.md](references/verifier.md): independent verifier brief and report contract
 - [references/workers.md](references/workers.md): starting, messaging, pausing and stopping worker sessions
+- [references/mini.md](references/mini.md): the same run in one session, with subagents as implementers and verifiers
 - [references/lessons.md](references/lessons.md): failure modes seen in real runs. Read it once per run, before dispatch.
 - [references/merge-brief.md](references/merge-brief.md): what to explain before a human merges
 - [references/profile-template.md](references/profile-template.md): the project profile format

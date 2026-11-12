@@ -154,6 +154,12 @@ class Closeable(unittest.TestCase):
         self.assertEqual(got, ["run-i1 [eee555]", "run-i2 [abc777]", "run-v1 [fff666]"])
 
 
+    def test_subagent_workers_are_not_sessions_to_close(self):
+        text = WORKERS + "| 2026-11-12-q-03 | implementer | subagent | wt/d | 03 | dropped: done |\n"
+        _, _, units = sweep.parse_state("r", text)
+        got = sweep.closeable_sessions("r", text, units, closed=True)
+        self.assertNotIn("2026-11-12-q-03", " ".join(got))  # a mini run's subagents end with the run, not by the human
+
     def test_no_duplicates_or_junk_names(self):
         text = WORKERS.replace("| run-01 | implementer | [aaa111] | wt/a | 01 | working: idle |",
                                "| run-01 | implementer | [aaa111] | wt/a | 01 | done: finished |\n| orch | x | - | - | 01 | done |")

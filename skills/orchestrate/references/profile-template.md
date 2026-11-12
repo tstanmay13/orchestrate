@@ -21,6 +21,7 @@ Orchestrator: <model, effort>   Implementers: <model, effort>   Verifier: <model
 
 ## Dispatch
 <orchestrator (it starts workers itself) or human (it hands the human a launch block per unit)>
+<`/orchestrate mini` overrides this for that run only: the human asked for subagents, see references/mini.md>
 
 ## Standing permissions (workers may, without asking)
 - ...

@@ -12,6 +12,7 @@ Then:
 ```
 /orchestrate fix the follow-ups in TICKET-123, split into PRs
 /orchestrate resume 2026-10-04-ticket-123
+/orchestrate mini add queue operator tools   # same workflow in one session, with subagents
 ```
 
 `/deepen` is also available on its own. It turns any request into its deeper version before doing it: what a top practitioner would add, the rawest sources, their methods and tools, and the outside evidence that the result is right. `/orchestrate` runs it during intake.
