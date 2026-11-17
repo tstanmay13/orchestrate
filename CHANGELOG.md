@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Runner executes and observes; it does not rank severity or diagnose. Its report has Observations and Surprises; the orchestrator ranks and routes, the verifier takes code questions. Runner model is mid-tier (Sonnet), not the strongest.
 - A runner role (references/runner.md): a separate session or subagent runs the real thing, black box, through user journeys and misuse cases, before reading the diff. It runs at checkpoints where something becomes runnable (a flow's last unit, a wave's end, before a deploy or release), not per PR, and only when the plan can name a bug it would catch that tests and the verifier would miss. A checkpoint run gates the next checkpoint; a single unit's merge gate includes a run only when the plan gives that unit one. Units table gains a `runner` column and a `run` stage.
 - Verifier: a change must not edit the check that judges it; flaky is broken; prefer property or differential tests where an invariant exists; behaviour people see belongs to the runner.
 - `ready` now means ready to send to a reviewer for approval: every gate of ours has passed, and only a person's approval and the human's merge are left. Status messages and `sweep.py` list these units as "Ready to send for approval".

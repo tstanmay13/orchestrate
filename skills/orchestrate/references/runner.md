@@ -13,7 +13,7 @@ A runner earns its cost only when a run can show something the tests and the ver
 
 Runs are not part of each unit's own merge gate unless the plan says so for that unit. A checkpoint run that fails blocks the next checkpoint (the next wave, the deploy, the release), and its findings go to the units that caused them.
 
-The profile picks the model. One runner session may run every unit in a run, one after another, like the verifier. Start a new runner session every five or six units, or when it compacts.
+The runner executes and observes; it does not judge. It runs the journeys, records exactly what happened against what was expected, and writes down anything surprising with its evidence. Ranking severity, deciding whether something is a bug, and finding the cause belong to the orchestrator, who asks the verifier when the code is involved. So the profile's runner model is a capable mid-tier one (Sonnet in most profiles), not the strongest: the hard part of a run is usually the setup (building the tip, a temp HOME, a fixture server, sign-in), which a weak model mistakes for product failures. A checkpoint that gates something hard to undo may use a stronger model if the orchestrator says so in the plan. One runner session may run every unit in a run, one after another, like the verifier. Start a new runner session every five or six units, or when it compacts.
 
 ## Inputs, in this order
 
@@ -47,9 +47,13 @@ Ran at: <full SHA>   Against: <host / fixture>   Runner session: <stable ref>
 | # | Journey | Result | Evidence |
 <one row per journey and per misuse case: pass / fail, with the command or screenshot reference>
 
-## Findings
-<Each: the journey and step, what the person saw vs expected, the exact command and output, how often it happens.
-End each with `R<n> | <blocking|should-fix|nit> | <journey|misuse|copy>`>
+## Observations
+<Each: the journey and step, what was expected, what happened, the exact command and output, how often it happens.
+Don't rank severity or guess the cause. End each with `R<n> | <journey|misuse|copy|setup>`>
+
+## Surprises
+<Anything the journeys didn't ask about but a person would notice: a slow step, an unexpected warning, confusing or
+internal wording, output that wraps or breaks, a state left behind. Evidence for each; no judgment.>
 
 ## Transcript
 <The commands and outputs, trimmed of nothing that matters. Never tokens or secrets.>
@@ -58,4 +62,4 @@ End each with `R<n> | <blocking|should-fix|nit> | <journey|misuse|copy>`>
 <Journeys that couldn't run here and why: they need dev, prod, an outside client or a person. The orchestrator owns these after merge.>
 ```
 
-`pass` means every journey ran at this SHA with the expected result and no open finding. A new commit that changes behaviour reopens the run for what it changed.
+`pass` means every journey ran at this SHA with the expected result. The orchestrator reads the observations and surprises, ranks them, and routes any that are real; the verifier gets the ones that need the code. A new commit that changes behaviour reopens the run for what it changed.
