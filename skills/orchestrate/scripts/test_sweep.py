@@ -137,6 +137,17 @@ INLINE = """| unit | implementer | verifier | status | PR |
 """
 
 
+class ForYou(unittest.TestCase):
+    def test_for_you_items_are_read_and_waiting_notes_are_not(self):
+        text = "# State\n\n## For you\n- Approve and merge #18791 — prod alerts [U3]\n- Paste the runner launch line [R1]\n\n## Units\n| unit | status |\n|---|---|\n| U4 x | waiting: Miroslav's review |\n"
+        _, needs, _ = sweep.parse_state("r", text)
+        self.assertEqual(needs, ["Approve and merge #18791 — prod alerts [U3]", "Paste the runner launch line [R1]"])
+
+    def test_an_empty_section_is_nothing_for_you(self):
+        _, needs, _ = sweep.parse_state("r", "# State\n\n## For you\n\n## Units\n")
+        self.assertEqual(needs, [])
+
+
 class Closeable(unittest.TestCase):
     def test_workers_table(self):
         _, _, units = sweep.parse_state("r", WORKERS)

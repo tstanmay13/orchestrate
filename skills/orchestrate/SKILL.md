@@ -48,7 +48,9 @@ Tools read `state.md` to show the human a board of the run, so keep this shape e
 
 ```
 # State
-**Needs you:** <ask>          only while a run-wide question is open
+
+## For you
+- <verb> <target> — <what it unblocks> [<unit>]          only actions the human can take right now
 
 ## Units
 | unit | stage | status | PR | branch | implementer | verifier | runner | worktree | tip | verified tip | final-review tip | last checked |
@@ -81,7 +83,15 @@ Each `status` cell, in both tables, starts with one word, then a colon and a not
 - `waiting`: blocked on another unit or an outside PR. The note names it, as in `waiting: after W4 #17268`.
 - `paused`, `merged` or `dropped`.
 
-Longer context goes in `plan.md` or the reports, not in the cell. A question for the human that is not about one unit goes on the `**Needs you:**` line. When nothing is open, delete that line; don't write "nothing open". Tools use these words to show the human what needs them across runs. So set `needs-you` before you send the message that asks, and change it back once the human answers.
+Longer context goes in `plan.md` or the reports, not in the cell. Tools use these words to show the human what needs them across runs, so set `needs-you` before you send the message that asks, and change it back once the human answers.
+
+**`## For you` is the human's to-do list, and the only thing tools alert on.** An item belongs there only when all of these hold:
+- **The human, and only the human, can do it now:** approve or merge a PR, apply or promote, dispatch a workflow, write a secret, paste a launch line, answer a decision, send a drafted message.
+- **Nothing is in front of it.** Its prerequisites are done. "Merge #B after #A" is not an item until #A has merged; until then it is a note in the unit's status.
+- **It is not waiting on someone else.** A teammate's review, CI, a verifier or a runner are not the human's actions. Name them in the unit's status (`waiting: Miroslav's review`), never under For you.
+- **One line per action,** starting with the verb: `- Approve and merge #18791 — prod alerts, must land before #18784 [U3]`. No duplicate of a unit row, no run-wide prose.
+
+Remove an item the moment its action is observed: the PR merged or was approved (the merge watcher sees it), the launch line's session appears, the decision is answered. Add the next item that just became actionable in the same edit. When nothing is actionable, the section is empty (keep the heading). A `ready` unit is not automatically an item: it becomes one only when sending it for approval is the human's next move and nothing above holds it back.
 
 `<run>` is `YYYY-MM-DD-<slug>`. If the argument is `resume <run>`, read `plan.md`, `state.md`, the newest implementer reports and verification reports, then go straight to the **Monitor** step. If `state.md` has a `**Closed:**` line, remove it: the run is open again.
 

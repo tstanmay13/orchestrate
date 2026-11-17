@@ -1,7 +1,8 @@
 """Sweep every active run's state.md and check its claims against git.
 
 Prints, for the human:
-- units whose status starts with "ready", meaning ready to send for approval (PR, sha, run), and every "**Needs you:**" line;
+- units whose status starts with "ready", meaning ready to send for approval (PR, sha, run), and every
+  `## For you` item (or legacy "**Needs you:**" line);
 - stale rows: a unit not marked merged/done/dropped whose PR is already on the main branch;
 - recheck rows: a ready unit whose branch tip moved past the sha in its ready line, or whose
   changed files were also changed on main after its gate sha;
@@ -65,10 +66,17 @@ def align(header: list[str], row: list[str]) -> dict[str, str]:
 
 
 def parse_state(run: str, text: str) -> tuple[bool, list[str], list[Unit]]:
-    """Whether the run is closed, its Needs-you lines, and the rows of its units table."""
+    """Whether the run is closed, its For-you items (or legacy Needs-you lines), and its units table rows."""
     lines = text.splitlines()
     closed = any(line.startswith("**Closed:**") for line in lines)
+    # The `## For you` section is the human's to-do list; older runs used a `**Needs you:**` line.
     needs = [line.split(":**", 1)[1].strip() for line in lines if line.startswith("**Needs you:**")]
+    in_for_you = False
+    for line in lines:
+        if line.startswith("## "):
+            in_for_you = line.strip().lower() == "## for you"
+        elif in_for_you and line.startswith("- "):
+            needs.append(line[2:].strip())
     units: list[Unit] = []
     header: list[str] | None = None
     for line in lines:
@@ -247,7 +255,7 @@ def sweep(git: Git, runs: list[pathlib.Path], fetch: bool) -> list[str]:
                 shown = ", ".join(both[:5]) + (f" (+{len(both) - 5} more)" if len(both) > 5 else "")
                 recheck.append(f"- {u.name} #{u.pr}: main changed files this PR changes since its gate: {shown}")
 
-    out.append("\nNeeds you")
+    out.append("\nFor you (actions only the human can take now)")
     out += [f"- {name}: {line}" for name, needs, _ in parsed for line in needs] or ["- none"]
 
     stale = [u for u in units if u.pr in merged and u.state not in FINISHED]
