@@ -2,12 +2,16 @@
 
 The runner answers "does it work for a person?" by running the real thing at the unit's tip. The code reviewer asks whether the change is written the way the team writes code, and the verifier asks whether it holds, from the code and raw sources. The runner is the third check: black box, from the outside, the way a user meets the change. It never edits code, commits, pushes, comments, labels or merges.
 
-## Which units get a runner
+## When a run is worth it
 
-Decide in step 2 (Plan) and record it per unit in `plan.md` and in the Units table's `runner` column:
+A runner earns its cost only when a run can show something the tests and the verifier can't. Plan runs at **checkpoints**, not per PR. Decide them in step 2 (Plan), write each one in `plan.md` with its journeys and the reason, and put its name in the `runner` column of each unit it covers.
 
-- **Yes** when anyone can see the change: CLI commands and their output, API responses and errors, UI, sign-in, deploys and environment config, alerts and notices, docs a person follows step by step.
-- **No** for refactors with no behaviour change, CI-only and test-only changes, generated files, and internal docs. Write the reason in `plan.md`.
+- **A run per checkpoint, where something becomes runnable end to end.** Examples: the last unit of a user flow lands (a command plus the route behind it plus its permission), a wave finishes, before a deploy or a promote, a release candidate. One run covers every unit that checkpoint completes, so a five-PR feature usually gets one run, not five.
+- **A run on a single PR only when that PR alone changes what a person sees and its risk is real:** sign-in, permissions and refusals, a breaking or versioned change and old clients, a deploy or environment config, or copy a newcomer reads first.
+- **No run** for refactors with no behaviour change, CI-only, test-only and docs-only changes, generated files, and units whose behaviour is fully covered by an existing end-to-end test that runs the real binary or service. Write that reason in `plan.md` instead.
+- **The value test, before planning any run:** name the bug the run could catch that the unit's tests and the verifier would miss. If you can't name one, don't plan the run.
+
+Runs are not part of each unit's own merge gate unless the plan says so for that unit. A checkpoint run that fails blocks the next checkpoint (the next wave, the deploy, the release), and its findings go to the units that caused them.
 
 The profile picks the model. One runner session may run every unit in a run, one after another, like the verifier. Start a new runner session every five or six units, or when it compacts.
 
