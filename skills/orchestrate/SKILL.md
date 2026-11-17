@@ -10,7 +10,7 @@ metadata:
 
 # orchestrate
 
-You are the **orchestrator** for this job. Implementers do the work. A separate verifier challenges each completed unit. You own the plan, briefs, routing, evidence check and conversation with the human.
+You are the **orchestrator** for this job. Implementers do the work. A separate verifier challenges each completed unit, and a runner runs the real thing for units anyone can see. You own the plan, briefs, routing, evidence check and conversation with the human.
 
 **Mini mode.** If the argument starts with `mini`, read [references/mini.md](references/mini.md) first and follow it with every step below: the same run, reviews and gates, in this one session, with subagents as the implementers and verifiers. It suits one to three units that nobody needs to step into. A run started as mini is resumed with `resume <run>` like any other; its `plan.md` says `Mode: mini`.
 
@@ -38,6 +38,7 @@ briefs/00-common.md   what every unit shares: read-first list, settled decisions
 briefs/NN-<unit>.md   only what differs for that unit; points to 00-common.md
 reports/NN-<unit>.md   written by workers, see references/report-contract.md
 verifications/NN-<unit>-<sha>.md   written by the verifier, see references/verifier.md
+runs/NN-<unit>-<sha>.md   written by the runner, see references/runner.md
 merge-briefs/<unit id>.md   the merge brief sent to the human, see step 8
 verifier-context.md   what the verifier must know about the whole run: invariants, settled decisions, defect classes missed before, known open items
 lessons.md     corrections from this run, each tagged generic or profile; promote each one when it is written
@@ -50,7 +51,7 @@ Tools read `state.md` to show the human a board of the run, so keep this shape e
 **Needs you:** <ask>          only while a run-wide question is open
 
 ## Units
-| unit | stage | status | PR | branch | implementer | verifier | worktree | tip | verified tip | final-review tip | last checked |
+| unit | stage | status | PR | branch | implementer | verifier | runner | worktree | tip | verified tip | final-review tip | last checked |
 
 ## Workers
 | worker | role | session | worktree | units | status |
@@ -58,13 +59,14 @@ Tools read `state.md` to show the human a board of the run, so keep this shape e
 
 **Units** has one row per PR, or per deliverable that has no PR, such as a posted comment. Write the unit cell as a short id and a name: `A2 access-write`. Do not add summary rows for a stack or an owner. The board builds stacks from each PR's base branch, and each stacked PR keeps its own row.
 
-**Workers** has one row per session: implementers, verifiers and live-run workers. `role` is `implementer`, `verifier` or `worker`. `units` lists the ids of the units the session owns. A session that has not started yet, such as one waiting for the human to paste its launch line, is a worker row with `needs-you`. It is not a unit row.
+**Workers** has one row per session: implementers, verifiers and live-run workers. `role` is `implementer`, `verifier`, `runner` or `worker`. `units` lists the ids of the units the session owns. A session that has not started yet, such as one waiting for the human to paste its launch line, is a worker row with `needs-you`. It is not a unit row.
 
 `stage` is the gate a unit is at now, as one word:
 - `build`: the implementer is writing the change.
 - `self-check`: the implementer is running its final review.
 - `ai-review`: the profile's automated review loop is running.
 - `verify`: the verifier is on it, for a first pass or a recheck.
+- `run`: the runner is running the unit's journeys at its tip.
 - `fix`: findings or red CI are being fixed.
 - `merge`: the merge gate is met, or the merge brief has been sent.
 - `real-run`: merged, and the "Needs a real run" list is still open.
@@ -116,12 +118,15 @@ Split the work into **units**. A unit has one implementing owner, one branch or 
 
 A unit that changes a seam messages you before pushing, and you update the brief of every unit that consumes it. Workers may message each other directly about a seam, with you copied, instead of relaying everything through you.
 
-Write `plan.md`, `state.md` and `verifier-context.md`. **Done when** every outcome maps to a unit, and every unit has an implementer, a verifier, a depth, a branch, a wave with its start condition, and acceptance criteria that a command or a URL can check.
+Write `plan.md`, `state.md` and `verifier-context.md`. **Done when** every outcome maps to a unit, and every unit has an implementer, a verifier, a depth, a runner or the reason it has none, a branch, a wave with its start condition, and acceptance criteria that a command or a URL can check.
 
-Three reviews, three jobs. Don't run any of them twice:
-- **Implementer's final review** (the one the profile names): is the code written the way the team writes it? Checklist, contract shape, style. It runs before the PR opens or moves forward.
-- **Verifier**: does it actually hold? Threats, seams between units, premises, proof by failing test or trace.
-- **Orchestrator**: is the evidence real? Audit the verifier's report, don't redo it.
+Four checks, four jobs. Don't run any of them twice:
+- **Implementer's final review** (the one the profile names, the code reviewer): is the code written the way the team writes it? Checklist, contract shape, style. It runs before the PR opens or moves forward.
+- **Verifier**: does it actually hold? Threats, seams between units, premises, proof by failing test or trace. It reads code.
+- **Runner**: does it work for a person? It runs the real thing at the tip, black box, through user journeys and misuse, without reading the diff first. See [references/runner.md](references/runner.md). Only for units anyone can see.
+- **Orchestrator**: is the evidence real? Audit the verifier's and the runner's reports, don't redo them.
+
+For each runner unit, rewrite its acceptance criteria as user journeys in its brief (actor, starting state, steps, what the person sees), and name where it runs: the fixture server, a local stack or a dev environment.
 
 ### 3. Brief
 
@@ -134,7 +139,7 @@ Hand each brief to an owner. First read [references/workers.md](references/worke
 - **Existing session:** if the human names a session, or the runtime’s agent listing shows an idle one that already owns the branch, use the available messaging capability. Give the brief path, profile path, report contract, and who to report to.
 - **A new unit gets a fresh session.** Never hand a new unit to a worker that already carries another unit's context: a long context costs tokens on every turn and drags old conclusions in. Either ask the human to clear an idle worker (`/clear` in that session) and then send it the first prompt, or give a launch line for a new session.
 - **New worker:** use native subagents when they support the required ownership, or a local worker process from the unit’s worktree. Put the user’s authorized scope and constraints in the brief. Launching a worker does not grant new permissions or bypass its sandbox.
-- **Human launches:** when the profile says `Dispatch: human`, do not start any implementer or verifier yourself, by subagent, background process or otherwise. For each unit, give the human one command line to paste, chained with `&&`: fetch the base, create the worktree and branch, `cd` into it, and open a named session there (`<run>-<unit>`, with the unit's model). Do not ask the human to paste a first prompt. Once the session shows up in the agent listing under that name, send it the first prompt yourself with SendMessage. The prompt names the profile, brief, report path, report contract and asks the session to acknowledge you. Then wait for the acknowledgment and keep its ref. **The verifier's launch line goes out in the same batch as the first wave's implementer lines,** never in a later round. Give it its own detached worktree from the base and a named session (`<run>-verifier`). Send its first prompt (the verifier context and "wait for review requests") as soon as it appears, so it's warm when the first unit reports ready. Later waves reuse the same verifier. Give a second verifier line only when the plan needs a second one. Subagents for your own research are still fine.
+- **Human launches:** when the profile says `Dispatch: human`, do not start any implementer, verifier or runner yourself, by subagent, background process or otherwise. For each unit, give the human one command line to paste, chained with `&&`: fetch the base, create the worktree and branch, `cd` into it, and open a named session there (`<run>-<unit>`, with the unit's model). Do not ask the human to paste a first prompt. Once the session shows up in the agent listing under that name, send it the first prompt yourself with SendMessage. The prompt names the profile, brief, report path, report contract and asks the session to acknowledge you. Then wait for the acknowledgment and keep its ref. **The verifier's launch line goes out in the same batch as the first wave's implementer lines,** never in a later round. When any unit in the run has a runner, the runner's launch line goes in that batch too (`<run>-runner`, a fresh worktree, the profile's runner model), and it gets its first prompt (runner.md, the journeys file, "wait for run requests") as soon as it appears. Give it its own detached worktree from the base and a named session (`<run>-verifier`). Send its first prompt (the verifier context and "wait for review requests") as soon as it appears, so it's warm when the first unit reports ready. Later waves reuse the same verifier. Give a second verifier line only when the plan needs a second one. Subagents for your own research are still fine.
 
 Record each implementer’s session ref or process handle in `state.md`, not just its display name. Confirm startup and acknowledgment promptly; subscribe to completion or idle notices when supported. **Done when** every unit in the current wave has acknowledged ownership. Dispatch only the current wave. When a later wave's start condition is met, write its briefs from what the earlier waves actually merged, not from the intake plan, then dispatch it.
 
@@ -163,10 +168,10 @@ Then audit the evidence yourself:
 - Read every finding the worker **declined**. If a reviewer questioned the approach and the worker set it aside, bring it to the human, even when the report files it as minor.
 
 There are two gates:
-- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, and every finding from both is fixed or answered. Record it in `state.md`. Draft status is not part of either gate. Any automated PR review loop the profile names may start once the implementer's final review is done, in parallel with the verifier and CI; its findings join the verifier's in one fix batch.
-- **Merge gate**: each acceptance criterion has evidence you checked; the verified tip and the final-review tip in `state.md` both equal the PR head, which you read again with `gh pr view --json headRefOid` right before the merge brief (a commit added after the pass, including a merge from the base or a "small" fix, goes back to the verifier for those commits); the PR merges cleanly with its base; CI is green there; a doc-drift pass is recorded in the verification for the head; the automated review loop has finished; and no review thread is unanswered. If the head moved after a review, that review reruns on what changed. Then go to step 8.
+- **Ready gate**: the reviews are done. The implementer's final review ran over the final diff, the verifier passed the PR head, the runner passed it for runner units, and every finding from all of them is fixed or answered. The runner can start as soon as the implementer reports ready, in parallel with the verifier. Record it in `state.md`. Draft status is not part of either gate. Any automated PR review loop the profile names may start once the implementer's final review is done, in parallel with the verifier and CI; its findings join the verifier's in one fix batch.
+- **Merge gate**: each acceptance criterion has evidence you checked; the verified tip and the final-review tip in `state.md` both equal the PR head, which you read again with `gh pr view --json headRefOid` right before the merge brief (a commit added after the pass, including a merge from the base or a "small" fix, goes back to the verifier, and to the runner when it changes behaviour, for those commits); a runner unit has a passing run at the head; the PR merges cleanly with its base; CI is green there; a doc-drift pass is recorded in the verification for the head; the automated review loop has finished; and no review thread is unanswered. If the head moved after a review, that review reruns on what changed. Then go to step 8.
 
-A green CI result or an implementer's own review cannot replace the verifier. A push that changes behaviour reopens both gates for what it changed.
+A green CI result or an implementer's own review cannot replace the verifier, and a test suite cannot replace the runner. A push that changes behaviour reopens both gates for what it changed.
 
 ### 7. Route
 
@@ -185,7 +190,7 @@ Then check understanding instead of asking "any questions?". Scale the check to 
 
 In every status message, list `ready` units under **Ready to send for approval**, with the PR link and who should approve when the repo or profile names one (a code owner, a team). The human sends each to that reviewer and merges once it is approved. A unit still missing any gate of ours is not in that list, even if its CI is green.
 
-After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" list yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
+After merge, a unit is verified at a SHA, not yet in an environment. Run the verifier's "Needs a real run" and the runner's "Not run" lists yourself or through a worker once the change is deployed (dev probes, an outside client, the production signal after a promotion), and record the result in `state.md`. The unit closes when that list is done or handed to the human.
 
 ### 9. Escalate
 
@@ -214,6 +219,7 @@ When every outcome is met, or blocked only on the human, write the closing repor
 - [references/brief-template.md](references/brief-template.md): the brief format
 - [references/report-contract.md](references/report-contract.md): what every worker report must contain
 - [references/verifier.md](references/verifier.md): independent verifier brief and report contract
+- [references/runner.md](references/runner.md): the runner, who runs the real thing at the tip through user journeys
 - [references/workers.md](references/workers.md): starting, messaging, pausing and stopping worker sessions
 - [references/mini.md](references/mini.md): the same run in one session, with subagents as implementers and verifiers
 - [references/lessons.md](references/lessons.md): failure modes seen in real runs. Read it once per run, before dispatch.

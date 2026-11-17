@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- A runner role (references/runner.md): for units anyone can see, a separate session or subagent runs the real thing at the tip, black box, through user journeys and misuse cases, before reading the diff. The plan decides per unit whether it gets one; its pass joins the ready and merge gates. Units table gains a `runner` column and a `run` stage.
+- Verifier: a change must not edit the check that judges it; flaky is broken; prefer property or differential tests where an invariant exists; behaviour people see belongs to the runner.
 - `ready` now means ready to send to a reviewer for approval: every gate of ours has passed, and only a person's approval and the human's merge are left. Status messages and `sweep.py` list these units as "Ready to send for approval".
 - Mini mode: `/orchestrate mini <goal>` runs the same workflow (deepen, plan, briefs, final review, independent verifier, both gates, merge brief, merge watcher) in one session, with a fresh implementer subagent per unit and a separate verifier subagent. Asking for it overrides `Dispatch: human` for that run. `sweep.py` leaves `subagent` workers out of the sessions to close.
 - A ready unit goes back to `working` / `fix` in `state.md` as soon as a comment, commit, red CI or conflict reopens it, before the work is routed.
